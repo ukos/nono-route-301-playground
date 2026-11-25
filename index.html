@@ -45,6 +45,12 @@
   .expl .judge.ok{color:var(--good);} .expl .judge.ng{color:var(--bad);}
   .score{font-size:20px; text-align:center; margin:24px 0 8px;}
   .note{color:var(--muted); font-size:13px; line-height:1.7; margin-top:10px;}
+  .evcard{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; margin-bottom:8px;}
+  .evcard .evlabel{font-size:12px; color:var(--accent); font-weight:700; margin-bottom:6px;}
+  .evcard pre{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;
+    line-height:1.65; white-space:pre-wrap; word-break:break-all;}
+  .done{color:var(--good); font-weight:700;}
 </style>
 </head>
 <body>
@@ -56,15 +62,15 @@
     <div style="margin-top:40px;">
       <button class="btn primary" id="btn-start">▶ はじめる</button>
     </div>
-    <p class="ver">ver. 0.3（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+    <p class="ver">ver. 0.4（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
   </section>
 
   <!-- メニュー選択 -->
   <section id="scr-menu" class="screen">
     <div class="head"><button class="back" data-go="scr-title">← 戻る</button><h2>メニュー</h2></div>
     <button class="btn" id="btn-exam">試験対策編<span class="cnt" id="cnt-exam"></span></button>
-    <button class="btn" id="btn-field">現場実践編<span class="cnt">準備中</span></button>
-    <p class="note">現場実践編は Phase 3 で実装予定です（FAULT LINE 方式のユースケース対処、20〜30問）。</p>
+    <button class="btn" id="btn-field">現場実践編<span class="cnt" id="cnt-field"></span></button>
+    <p class="note">現場実践編は、症状と観測情報から原因を特定するケース問題です。</p>
   </section>
 
   <!-- 分野選択 -->
@@ -86,6 +92,29 @@
       <div id="quiz-expl-text"></div>
     </div>
     <button class="btn primary" id="btn-next" style="display:none;">次へ →</button>
+  </section>
+
+  <!-- 現場実践編：ケース一覧 -->
+  <section id="scr-cases" class="screen">
+    <div class="head"><button class="back" data-go="scr-menu">← 戻る</button><h2>現場実践編：ケースを選ぶ</h2></div>
+    <div id="case-list"></div>
+    <p class="note">症状と観測情報から、原因を1つ特定してください。解いたケースには ✓ が付きます。</p>
+  </section>
+
+  <!-- 現場実践編：ケース画面 -->
+  <section id="scr-case" class="screen">
+    <div class="head"><button class="back" data-go="scr-cases">← やめる</button><h2 id="case-head">ケース</h2></div>
+    <div class="meta" id="case-meta"></div>
+    <div class="stem" id="case-symptom"></div>
+    <div id="case-evidence"></div>
+    <div class="stem" id="case-question"></div>
+    <div id="case-choices"></div>
+    <button class="btn primary" id="btn-case-answer">回答する</button>
+    <div class="expl" id="case-expl">
+      <div class="judge" id="case-judge"></div>
+      <div id="case-expl-text"></div>
+    </div>
+    <button class="btn primary" id="btn-case-next" style="display:none;">ケース一覧へ戻る</button>
   </section>
 
   <!-- 結果画面 -->
@@ -110,7 +139,6 @@ function show(id){
 document.querySelectorAll("[data-go]").forEach(b =>
   b.addEventListener("click", () => show(b.dataset.go)));
 $("btn-start").addEventListener("click", () => show("scr-menu"));
-$("btn-field").addEventListener("click", () => show("scr-menu")); // 準備中：メニューに留まる
 
 async function load(){
   const res = await fetch("data/questions.json");
@@ -118,6 +146,7 @@ async function load(){
   $("cnt-exam").textContent = "全" + DATA.questions.length + "問";
   buildDomains();
   $("btn-exam").addEventListener("click", () => show("scr-domains"));
+  loadCases();
 }
 function buildDomains(){
   const list = $("domain-list"); list.innerHTML = "";
@@ -186,6 +215,85 @@ $("btn-next").addEventListener("click", () => {
     show("scr-result");
   }
 });
+
+/* ===== 現場実践編 ===== */
+let CASES = null, curCase = null;
+const solvedCases = new Set();
+const DOMAIN_TAG = { "infra":"分野1", "switching":"分野2", "routing":"分野3",
+  "services-security":"分野4", "ai-ops":"分野5" };
+async function loadCases(){
+  const res = await fetch("data/cases.json");
+  CASES = await res.json();
+  $("cnt-field").textContent = "全" + CASES.cases.length + "件";
+  buildCaseList();
+  $("btn-field").addEventListener("click", () => show("scr-cases"));
+}
+function buildCaseList(){
+  const list = $("case-list"); list.innerHTML = "";
+  CASES.cases.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "btn";
+    b.appendChild(document.createTextNode(c.title));
+    const s = document.createElement("span"); s.className = "cnt";
+    if (solvedCases.has(c.id)){
+      const d = document.createElement("span"); d.className = "done"; d.textContent = "✓ 解決済み";
+      s.appendChild(d);
+    } else {
+      s.textContent = DOMAIN_TAG[c.domain] || c.domain;
+    }
+    b.appendChild(s);
+    b.addEventListener("click", () => startCase(i));
+    list.appendChild(b);
+  });
+}
+function startCase(i){
+  const c = CASES.cases[i];
+  curCase = { data: c, picked: null, locked: false };
+  $("case-head").textContent = "ケース " + (i + 1) + " / " + CASES.cases.length;
+  $("case-meta").textContent = (DOMAIN_TAG[c.domain] || c.domain) + "／原因の特定";
+  $("case-symptom").textContent = c.symptom;
+  const ev = $("case-evidence"); ev.innerHTML = "";
+  c.evidence.forEach(e => {
+    const card = document.createElement("div"); card.className = "evcard";
+    const lab = document.createElement("div"); lab.className = "evlabel"; lab.textContent = e.label;
+    const pre = document.createElement("pre"); pre.textContent = e.body;
+    card.appendChild(lab); card.appendChild(pre); ev.appendChild(card);
+  });
+  $("case-question").textContent = c.question;
+  const box = $("case-choices"); box.innerHTML = "";
+  c.choices.forEach((ch, j) => {
+    const b = document.createElement("button");
+    b.className = "btn choice"; b.textContent = "ABCD"[j] + ". " + ch;
+    b.addEventListener("click", () => {
+      if (curCase.locked) return;
+      curCase.picked = j;
+      [...box.children].forEach((el, k) => el.classList.toggle("sel", k === j));
+    });
+    box.appendChild(b);
+  });
+  $("btn-case-answer").style.display = "";
+  $("case-expl").className = "expl";
+  $("btn-case-next").style.display = "none";
+  show("scr-case");
+}
+$("btn-case-answer").addEventListener("click", () => {
+  if (!curCase || curCase.locked || curCase.picked === null) return;
+  curCase.locked = true;
+  const c = curCase.data;
+  const ok = curCase.picked === c.answer;
+  if (ok) solvedCases.add(c.id);
+  [...$("case-choices").children].forEach((el, j) => {
+    if (j === c.answer) el.classList.add("correct");
+    else if (j === curCase.picked) el.classList.add("wrong");
+  });
+  $("case-judge").textContent = ok ? "正解" : "不正解（正解：" + "ABCD"[c.answer] + "）";
+  $("case-judge").className = "judge " + (ok ? "ok" : "ng");
+  $("case-expl-text").textContent = c.explanation;
+  $("case-expl").classList.add("show");
+  $("btn-case-answer").style.display = "none";
+  $("btn-case-next").style.display = "";
+});
+$("btn-case-next").addEventListener("click", () => { buildCaseList(); show("scr-cases"); });
 load();
 </script>
 </body>
