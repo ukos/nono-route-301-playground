@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ROUTE 301</title>
+<link rel="icon" type="image/png" href="icon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+  :root{
+    --bg:#0a1120; --panel:#101a30; --panel2:#16233f; --line:#2a3c5f;
+    --text:#e8eef7; --muted:#93a5c4; --accent:#35c4e8; --good:#3ecf6e; --bad:#f2604d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--bg); color:var(--text);
+    font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;}
+  #app{max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column;
+    padding:calc(12px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));}
+  .screen{display:none; flex-direction:column; flex:1;}
+  .screen.active{display:flex;}
+  .logoimg{display:block; width:100%; max-width:330px; margin:9dvh auto 0; border-radius:14px;}
+  .ver{text-align:center; color:var(--muted); font-size:12px; margin-top:auto;}
+  .btn{display:block; width:100%; padding:16px; margin:8px 0; background:var(--panel2);
+    color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:16px;
+    text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;}
+  .btn:active{background:var(--line);}
+  .btn.primary{background:#123a4d; border-color:var(--accent);}
+  .btn:disabled{opacity:.45; cursor:default;}
+  .btn .cnt{float:right; color:var(--muted); font-size:13px;}
+  .head{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .back{background:none; border:1px solid var(--line); color:var(--text); border-radius:8px;
+    padding:8px 12px; font-size:14px; cursor:pointer; white-space:nowrap;}
+  .head h2{font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .stem{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px; font-size:15px; line-height:1.7; white-space:pre-wrap; margin-bottom:8px;}
+  .meta{color:var(--muted); font-size:12px; margin-bottom:10px;}
+  .choice{white-space:normal; line-height:1.6;}
+  .choice.sel{border-color:var(--accent); background:#14314a;}
+  .choice.correct{border-color:var(--good); background:#123524;}
+  .choice.wrong{border-color:var(--bad); background:#3d1712;}
+  .expl{display:none; background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px; font-size:14px; line-height:1.8; margin-top:8px;}
+  .expl.show{display:block;}
+  .expl .judge{font-weight:700; margin-bottom:6px;}
+  .expl .judge.ok{color:var(--good);} .expl .judge.ng{color:var(--bad);}
+  .score{font-size:20px; text-align:center; margin:24px 0 8px;}
+  .note{color:var(--muted); font-size:13px; line-height:1.7; margin-top:10px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- タイトル画面：ロゴ＋開始導線のみ -->
+  <section id="scr-title" class="screen active">
+    <img class="logoimg" src="assets/logo.jpg" alt="ROUTE 301">
+    <div style="margin-top:40px;">
+      <button class="btn primary" id="btn-start">▶ はじめる</button>
+    </div>
+    <p class="ver">ver. 0.1（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+  </section>
+
+  <!-- メニュー選択 -->
+  <section id="scr-menu" class="screen">
+    <div class="head"><button class="back" data-go="scr-title">← 戻る</button><h2>メニュー</h2></div>
+    <button class="btn" id="btn-exam">試験対策編<span class="cnt" id="cnt-exam"></span></button>
+    <button class="btn" id="btn-field">現場実践編<span class="cnt">準備中</span></button>
+    <p class="note">現場実践編は Phase 3 で実装予定です（FAULT LINE 方式のユースケース対処、20〜30問）。</p>
+  </section>
+
+  <!-- 分野選択 -->
+  <section id="scr-domains" class="screen">
+    <div class="head"><button class="back" data-go="scr-menu">← 戻る</button><h2>試験対策編：分野を選ぶ</h2></div>
+    <div id="domain-list"></div>
+    <p class="note">分野と配分は CCNA v2.0 のブループリントに準拠。問題は順次追加されます。</p>
+  </section>
+
+  <!-- 出題画面 -->
+  <section id="scr-quiz" class="screen">
+    <div class="head"><button class="back" data-go="scr-domains">← やめる</button><h2 id="quiz-head">問題</h2></div>
+    <div class="meta" id="quiz-meta"></div>
+    <div class="stem" id="quiz-stem"></div>
+    <div id="quiz-choices"></div>
+    <button class="btn primary" id="btn-answer">回答する</button>
+    <div class="expl" id="quiz-expl">
+      <div class="judge" id="quiz-judge"></div>
+      <div id="quiz-expl-text"></div>
+    </div>
+    <button class="btn primary" id="btn-next" style="display:none;">次へ →</button>
+  </section>
+
+  <!-- 結果画面 -->
+  <section id="scr-result" class="screen">
+    <div class="head"><h2>結果</h2></div>
+    <p class="score" id="result-score"></p>
+    <p class="note" id="result-note" style="text-align:center;"></p>
+    <button class="btn" data-go="scr-domains">分野選択へ戻る</button>
+    <button class="btn" data-go="scr-menu">メニューへ戻る</button>
+  </section>
+
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let DATA = null, quiz = null;
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-go]").forEach(b =>
+  b.addEventListener("click", () => show(b.dataset.go)));
+$("btn-start").addEventListener("click", () => show("scr-menu"));
+$("btn-field").addEventListener("click", () => show("scr-menu")); // 準備中：メニューに留まる
+
+async function load(){
+  const res = await fetch("data/questions.json");
+  DATA = await res.json();
+  $("cnt-exam").textContent = "全" + DATA.questions.length + "問";
+  buildDomains();
+  $("btn-exam").addEventListener("click", () => show("scr-domains"));
+}
+function buildDomains(){
+  const list = $("domain-list"); list.innerHTML = "";
+  DATA.domains.forEach(d => {
+    const n = DATA.questions.filter(q => q.domain === d.id).length;
+    const b = document.createElement("button");
+    b.className = "btn"; b.disabled = n === 0;
+    b.innerHTML = "";
+    b.appendChild(document.createTextNode(d.name + "（" + d.weight + "%）"));
+    const c = document.createElement("span"); c.className = "cnt";
+    c.textContent = n ? n + "問" : "準備中"; b.appendChild(c);
+    b.addEventListener("click", () => startQuiz(d.id));
+    list.appendChild(b);
+  });
+}
+function startQuiz(domainId){
+  const qs = DATA.questions.filter(q => q.domain === domainId);
+  quiz = { list: qs, idx: 0, score: 0, picked: new Set(), locked: false };
+  renderQ(); show("scr-quiz");
+}
+function renderQ(){
+  const q = quiz.list[quiz.idx];
+  quiz.picked = new Set(); quiz.locked = false;
+  $("quiz-head").textContent = "問題 " + (quiz.idx + 1) + " / " + quiz.list.length;
+  $("quiz-meta").textContent = q.subtopic + (q.type === "multi" ? "（複数回答）" : "（単一回答）");
+  $("quiz-stem").textContent = q.stem;
+  const box = $("quiz-choices"); box.innerHTML = "";
+  q.choices.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "btn choice"; b.textContent = "ABCD"[i] + ". " + c;
+    b.addEventListener("click", () => {
+      if (quiz.locked) return;
+      if (q.type === "single"){ quiz.picked = new Set([i]); }
+      else { quiz.picked.has(i) ? quiz.picked.delete(i) : quiz.picked.add(i); }
+      [...box.children].forEach((el, j) => el.classList.toggle("sel", quiz.picked.has(j)));
+    });
+    box.appendChild(b);
+  });
+  $("btn-answer").style.display = "";
+  $("quiz-expl").className = "expl";
+  $("btn-next").style.display = "none";
+}
+$("btn-answer").addEventListener("click", () => {
+  const q = quiz.list[quiz.idx];
+  if (quiz.locked || quiz.picked.size === 0) return;
+  quiz.locked = true;
+  const ok = quiz.picked.size === q.answer.length && q.answer.every(a => quiz.picked.has(a));
+  if (ok) quiz.score++;
+  [...$("quiz-choices").children].forEach((el, j) => {
+    if (q.answer.includes(j)) el.classList.add("correct");
+    else if (quiz.picked.has(j)) el.classList.add("wrong");
+  });
+  $("quiz-judge").textContent = ok ? "正解" : "不正解（正解：" + q.answer.map(a => "ABCD"[a]).join("・") + "）";
+  $("quiz-judge").className = "judge " + (ok ? "ok" : "ng");
+  $("quiz-expl-text").textContent = q.explanation;
+  $("quiz-expl").classList.add("show");
+  $("btn-answer").style.display = "none";
+  $("btn-next").textContent = quiz.idx + 1 < quiz.list.length ? "次へ →" : "結果を見る →";
+  $("btn-next").style.display = "";
+});
+$("btn-next").addEventListener("click", () => {
+  if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
+  else {
+    $("result-score").textContent = quiz.score + " / " + quiz.list.length + " 問正解";
+    $("result-note").textContent = quiz.score === quiz.list.length ? "全問正解です。" : "間違えた問題は解説を読み直してみてください。";
+    show("scr-result");
+  }
+});
+load();
+</script>
+</body>
+</html>
