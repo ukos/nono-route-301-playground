@@ -1,1 +1,562 @@
-{"cases":[{"answer":0,"choices":["duplex（デュプレックス）のミスマッチ","ケーブルの長さ超過","IP アドレスの重複","STP のループ"],"domain":"infra","evidence":[{"body":"Interface GigabitEthernet0/1\n  Half-duplex, 100Mb/s\n  1523 late collisions, 842 deferred\n  0 input errors, 0 CRC","label":"スイッチ側 show interfaces"},{"body":"Interface GigabitEthernet0/0\n  Full-duplex, 100Mb/s\n  0 collisions\n  1204 input errors, 1187 CRC, 391 frame","label":"ルータ側 show interfaces"}],"explanation":"片側が half、片側が full で動作する duplex ミスマッチ。半二重側は送信中の受信をコリジョンと誤認して late collision を数え、全二重側は途中で途切れたフレームを CRC／フレームエラーとして数える。両端の duplex と speed を明示的にそろえるのが対処。","id":"c01","question":"原因として最も可能性が高いものを選べ。","symptom":"拠点ルータとスイッチの間の通信が極端に遅い。ping は通るが、大きなファイルの転送が頻繁に止まる。両端のインターフェース情報を集めた。","title":"通信が遅く、エラーカウンタが増える"},{"answer":1,"choices":["DHCP サーバのアドレスプール枯渇","DHCP リレー（ip helper-address）の設定漏れ","DNS サーバの障害","端末側の NIC 故障"],"domain":"infra","evidence":[{"body":"・サーバは VLAN 10（管理系）に設置され、VLAN 10 の端末へは正常に配布している\n・サーバのプールには空きアドレスが十分ある\n・VLAN 20 の SVI には ip helper-address の設定がない","label":"DHCP サーバの状態"},{"body":"IP address: 169.254.18.22\nSubnet mask: 255.255.0.0\nDefault gateway: （なし）","label":"VLAN 20 の端末 ipconfig"}],"explanation":"169.254 は APIPA で、DHCP 要求がサーバに届いていないサイン。サーバ自体とプールは正常で、欠けているのは別サブネットへ要求を中継するリレー設定。SVI に ip helper-address を設定する。","id":"c02","question":"原因として最も可能性が高いものを選べ。","symptom":"新設した VLAN 20 の端末だけ、IP アドレスが取得できず 169.254.x.x になってしまう。VLAN 10 の端末は正常に取得できている。","title":"新しい VLAN だけアドレスが取れない"},{"answer":2,"choices":["ルータ ID の重複","hello タイマの不一致","エリアの不一致","回線の物理断"],"domain":"routing","evidence":[{"body":"interface GigabitEthernet0/0\n ip address 10.0.12.1 255.255.255.0\n ip ospf 1 area 0","label":"R1 の設定"},{"body":"interface GigabitEthernet0/0\n ip address 10.0.12.2 255.255.255.0\n ip ospf 1 area 1","label":"R2 の設定"},{"body":"（出力なし。ネイバは1台も表示されない）","label":"両ルータ show ip ospf neighbor"}],"explanation":"対向リンクで OSPF エリアが食い違うと、hello を受け取ってもネイバとして認識されず隣接が始まらない。サブネットは一致し、タイマは両端ともデフォルト（未設定）でそろっている。リンクの両端は同じエリアにそろえる。","id":"c03","question":"隣接が確立しない原因を選べ。","symptom":"2台のルータを直接つないで OSPF を有効にしたが、ネイバが一切表示されず経路が交換できない。","title":"OSPF ネイバが上がらない"},{"answer":0,"choices":["静的ルートのネクストホップ誤り","デフォルトルートの欠落","DNS の名前解決失敗","NAT テーブルの溢れ"],"domain":"routing","evidence":[{"body":"S 192.168.30.0/24 [1/0] via 10.0.12.2\nS 192.168.40.0/24 [1/0] via 10.0.23.9\nO 192.168.50.0/24 [110/2] via 10.0.12.2","label":"本社ルータ show ip route（抜粋）"},{"body":"・192.168.30.0/24（R2 の先）へは到達できる\n・192.168.40.0/24（R3 の先）へだけ到達できない\n・R3 との間のリンクは 10.0.23.0/30 で、R3 側は 10.0.23.2\n・他の拠点・インターネットへの通信は正常","label":"到達性の確認結果"}],"explanation":"192.168.40.0/24 向けのネクストホップが 10.0.23.9 になっているが、そのアドレスはリンク上に存在しない（R3 は 10.0.23.2）。到達可能なネットワークが他にある以上、デフォルトルートや回線全体の問題ではない。ネクストホップを 10.0.23.2 に直す。","id":"c04","question":"192.168.40.0/24 へ届かない原因を選べ。","symptom":"本社から特定の拠点ネットワーク（192.168.40.0/24）へだけ通信できない。他の拠点へは正常に届く。","title":"特定のネットワークへだけ届かない"},{"answer":1,"choices":["トランクが形成されていない","ネイティブ VLAN の不一致","STP でポートがブロッキングされている","DHCP スヌーピングによる遮断"],"domain":"switching","evidence":[{"body":"%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on GigabitEthernet0/1 (20), with SW2 GigabitEthernet0/1 (1)","label":"スイッチのログ"},{"body":"・VLAN 10、VLAN 30 の端末は棟間で通信できる（トランクは動作している）\n・VLAN 20 の端末だけ、対向棟の同じ VLAN 20 の端末と通信できない\n・両スイッチともトランクのカプセル化は 802.1Q","label":"切り分け結果"}],"explanation":"トランク自体は他の VLAN が通っている時点で動作している。タグなしで運ばれるネイティブ VLAN だけが、受信側で別の VLAN として扱われてしまうのがミスマッチの影響範囲。CDP の警告どおり、両端のネイティブ VLAN をそろえる。","id":"c05","question":"VLAN 20 だけ通信できない原因を選べ。","symptom":"2棟のスイッチ間トランクで、VLAN 20 の端末だけが対向棟と通信できない。他の VLAN は正常。スイッチのログには警告が出ている。","title":"特定の VLAN だけ棟間通信できない"},{"answer":2,"choices":["静的 NAT の設定漏れ","DNS の A レコード誤り","ACL で 443 が許可されていない","Web サーバのサービス停止"],"domain":"services-security","evidence":[{"body":"Extended IP access list WAN-IN\n 10 permit tcp any host 203.0.113.10 eq www\n 20 deny ip any any (1482 matches)","label":"境界ルータ show access-lists（抜粋）"},{"body":"・社内からは https://www.example.co.jp にアクセスできる\n・社外からは http（80番）にはアクセスできるが、https（443番）がタイムアウトする\n・静的 NAT は設定済みで、80番の到達性で動作が確認できている","label":"切り分け結果"}],"explanation":"WAN 側 ACL が許可しているのは www（80）だけで、443 は暗黙の deny に落ちている（20番の deny のマッチ数が増えている）。NAT は 80 番が届く時点で機能しており、サーバも社内から https で応答している。ACL に 443 の許可を追加する。","id":"c06","question":"社外から https だけアクセスできない原因を選べ。","symptom":"社内の Web サーバをインターネットに公開したが、社外から https でアクセスできない。http ではアクセスできる。","title":"社外から https だけつながらない"},{"answer":1,"choices":["プライオリティが両方とも同じ値","HSRP グループ番号の不一致","仮想 IP アドレスの重複登録","hello タイマの不一致"],"domain":"routing","evidence":[{"body":"Vlan10 - Group 1\n  State is Active\n  Virtual IP address is 192.168.10.254\n  Priority 110","label":"ルータ A show standby brief 相当の抜粋"},{"body":"Vlan10 - Group 2\n  State is Active\n  Virtual IP address is 192.168.10.254\n  Priority 100","label":"ルータ B show standby brief 相当の抜粋"}],"explanation":"グループ番号が違うと、2台は別の HSRP グループとしてそれぞれ独立に Active になる。仮想 IP が同じでも、グループが違えば互いを相手と認識しない。プライオリティの差（110 と 100）は本来の冗長動作のための設定で、両方 Active の原因にはならない。グループ番号をそろえる。","id":"c07","question":"両方が Active になってしまう原因を選べ。","symptom":"HSRP でゲートウェイを冗長化したはずが、2台のルータが両方とも Active になってしまった。","title":"HSRP で両系が Active になる"},{"answer":0,"choices":["ポートセキュリティの違反による err-disable","ケーブルの接触不良","STP のブロッキング","スイッチのポート故障"],"domain":"switching","evidence":[{"body":"Gi0/5  err-disabled  connected    10      a-full  a-100  10/100/1000BaseTX","label":"show interfaces status"},{"body":"%PM-4-ERR_DISABLE: psecure-violation error detected on Gi0/5, putting Gi0/5 in err-disable state","label":"スイッチのログ"},{"body":"・そのポートには、利用者が私物の小型ハブをつないで PC とプリンタの2台を接続していた\n・ポートセキュリティは最大 MAC 1つで設定されていた","label":"現地確認"}],"explanation":"ログが psecure-violation を明示している。最大1つのポートに2台目の機器がつながり、学習済みと異なる MAC が現れたため違反として err-disable になった。私物ハブの撤去（または台数に応じた設定変更）と、ポートの復旧（shut／no shut）が必要。","id":"c08","question":"このポートが止まった原因を選べ。","symptom":"ある利用者の端末だけ、朝から突然ネットワークにつながらなくなった。スイッチのポートを確認すると err-disabled になっている。","title":"1台だけ突然つながらない（ポート停止）"},{"answer":2,"choices":["A レコードの誤り","メールサーバのサービス停止","MX レコードの未登録","SPF レコードの誤り"],"domain":"services-security","evidence":[{"body":"www.example.co.jp  A  203.0.113.10（正常に応答）","label":"名前解決の確認（A レコード）"},{"body":"example.co.jp  MX  （レコードが存在しない）","label":"名前解決の確認（MX レコード）"},{"body":"・社内のメールサーバは稼働しており、社内同士の送受信はできる\n・Web サイトの閲覧は社外からも正常","label":"切り分け結果"}],"explanation":"メール配送は MX レコードで宛先サーバを引く。その MX が存在しないため、外部のサーバは配送先を特定できない。A レコードは Web が正常な時点で正しく、社内送受信ができる以上サーバも稼働している。MX レコードを登録する。","id":"c09","question":"メールだけ届かない原因を選べ。","symptom":"会社の Web サイトは社外から正常に見えるのに、社外からのメールだけが届かない。","title":"メールだけ届かない"},{"answer":1,"choices":["新しい DHCP サーバの故障","DHCP スヌーピングの信頼（trust）設定漏れ","VLAN の割り当て誤り","アドレスプールの枯渇"],"domain":"infra","evidence":[{"body":"・新サーバを検証用 PC に直結すると、アドレスは正常に配布される\n・新サーバがつながるスイッチポートは access ポートで、dhcp snooping trust の設定がない\n・スイッチのログに、DHCP サーバ応答を破棄した記録が残っている","label":"切り分け結果"},{"body":"VLAN 10 の全端末がアドレスを取得できず、APIPA になっている","label":"障害の範囲"}],"explanation":"DHCP スヌーピングは、信頼されていないポートからの DHCP サーバ応答を不正サーバのものとして破棄する。正規サーバをつないだポートに trust 設定がないため、正規の応答まで捨てられていた。サーバ接続ポート（と上位リンク）に trust を設定する。","id":"c10","question":"アドレス配布が止まった原因を選べ。","symptom":"DHCP サーバを新しい機器に交換した直後から、その VLAN の全端末がアドレスを取得できなくなった。","title":"DHCP サーバ交換後に全端末が取れない"},{"answer":0,"choices":["サーバのサブネットマスク設定誤り","サーバの IP アドレス重複","ファイアウォールによる遮断","DNS の逆引き未登録"],"domain":"infra","evidence":[{"body":"IP アドレス: 192.168.1.130\nサブネットマスク: 255.255.255.128（/25）\nデフォルトゲートウェイ: 192.168.1.1\n※ このセグメントの正しいマスクは /24","label":"新サーバの設定"},{"body":"・192.168.1.200 の端末からはサーバに応答がある\n・192.168.1.50 の端末からはサーバに応答がない\n・他のサーバへはどちらの端末からも通信できる","label":"到達性の確認結果"}],"explanation":"サーバが /25 と誤認すると、192.168.1.128/25 の範囲（.129〜.254）だけを同一サブネットとみなす。.50 の端末は「別サブネット」扱いになり、返信がゲートウェイ（.1）へ送られるが、そのゲートウェイ自体もサーバからは別サブネット扱いで到達できない。到達可否がアドレス帯で分かれるのがマスク誤りの典型的な現れ方。","id":"c11","question":"アドレス帯で到達可否が分かれる原因を選べ。","symptom":"新しいサーバを設置したところ、同じセグメントの一部の端末からだけ応答がない。到達できる端末とできない端末が、アドレスの範囲できれいに分かれている。","title":"一部の端末からだけサーバに応答がない"},{"answer":2,"choices":["リンクの物理障害","ブロードキャストストームの発生","想定外のスイッチがルートブリッジになっている","DHCP サーバの応答遅延"],"domain":"switching","evidence":[{"body":"Root ID    Priority  32778\n             Address   0019.aa12.3456\n             This bridge is the root","label":"会議室の旧スイッチ show spanning-tree（抜粋）"},{"body":"・会議室に置かれた古い小型スイッチが、コアスイッチより小さい MAC アドレスを持っていた\n・コアスイッチの各ポートは、会議室方向を向いたルートポートになっている\n・全スイッチの STP プライオリティは未設定（デフォルト）","label":"現地確認"}],"explanation":"プライオリティが全台デフォルトだと、ブリッジ ID の比較は MAC アドレスの大小で決まり、最も小さい旧スイッチがルートブリッジに当選する。結果としてトラフィックが旧スイッチ経由に遠回りする。ブロードキャストストームは起きておらず、リンクも正常。コアスイッチのプライオリティを明示的に下げて（小さい値にして）ルートに固定するのが対処。","id":"c12","question":"経路が遠回りになる原因を選べ。","symptom":"フロアのネットワークが全体的に遅く、コアスイッチ同士を直結しているのに通信が会議室の旧スイッチを経由している。","title":"通信が旧スイッチを遠回りする"}]}
+{
+  "cases": [
+    {
+      "answer": 0,
+      "choices": [
+        "duplex（デュプレックス）のミスマッチ",
+        "ケーブルの長さ超過",
+        "IP アドレスの重複",
+        "STP のループ"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "Interface GigabitEthernet0/1\n  Half-duplex, 100Mb/s\n  1523 late collisions, 842 deferred\n  0 input errors, 0 CRC",
+          "label": "スイッチ側 show interfaces"
+        },
+        {
+          "body": "Interface GigabitEthernet0/0\n  Full-duplex, 100Mb/s\n  0 collisions\n  1204 input errors, 1187 CRC, 391 frame",
+          "label": "ルータ側 show interfaces"
+        }
+      ],
+      "explanation": "片側が half、片側が full で動作する duplex ミスマッチ。半二重側は送信中の受信をコリジョンと誤認して late collision を数え、全二重側は途中で途切れたフレームを CRC／フレームエラーとして数える。両端の duplex と speed を明示的にそろえるのが対処。",
+      "id": "c01",
+      "question": "原因として最も可能性が高いものを選べ。",
+      "symptom": "拠点ルータとスイッチの間の通信が極端に遅い。ping は通るが、大きなファイルの転送が頻繁に止まる。両端のインターフェース情報を集めた。",
+      "title": "通信が遅く、エラーカウンタが増える"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "DHCP サーバのアドレスプール枯渇",
+        "DHCP リレー（ip helper-address）の設定漏れ",
+        "DNS サーバの障害",
+        "端末側の NIC 故障"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "・サーバは VLAN 10（管理系）に設置され、VLAN 10 の端末へは正常に配布している\n・サーバのプールには空きアドレスが十分ある\n・VLAN 20 の SVI には ip helper-address の設定がない",
+          "label": "DHCP サーバの状態"
+        },
+        {
+          "body": "IP address: 169.254.18.22\nSubnet mask: 255.255.0.0\nDefault gateway: （なし）",
+          "label": "VLAN 20 の端末 ipconfig"
+        }
+      ],
+      "explanation": "169.254 は APIPA で、DHCP 要求がサーバに届いていないサイン。サーバ自体とプールは正常で、欠けているのは別サブネットへ要求を中継するリレー設定。SVI に ip helper-address を設定する。",
+      "id": "c02",
+      "question": "原因として最も可能性が高いものを選べ。",
+      "symptom": "新設した VLAN 20 の端末だけ、IP アドレスが取得できず 169.254.x.x になってしまう。VLAN 10 の端末は正常に取得できている。",
+      "title": "新しい VLAN だけアドレスが取れない"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "ルータ ID の重複",
+        "hello タイマの不一致",
+        "エリアの不一致",
+        "回線の物理断"
+      ],
+      "domain": "routing",
+      "evidence": [
+        {
+          "body": "interface GigabitEthernet0/0\n ip address 10.0.12.1 255.255.255.0\n ip ospf 1 area 0",
+          "label": "R1 の設定"
+        },
+        {
+          "body": "interface GigabitEthernet0/0\n ip address 10.0.12.2 255.255.255.0\n ip ospf 1 area 1",
+          "label": "R2 の設定"
+        },
+        {
+          "body": "（出力なし。ネイバは1台も表示されない）",
+          "label": "両ルータ show ip ospf neighbor"
+        }
+      ],
+      "explanation": "対向リンクで OSPF エリアが食い違うと、hello を受け取ってもネイバとして認識されず隣接が始まらない。サブネットは一致し、タイマは両端ともデフォルト（未設定）でそろっている。リンクの両端は同じエリアにそろえる。",
+      "id": "c03",
+      "question": "隣接が確立しない原因を選べ。",
+      "symptom": "2台のルータを直接つないで OSPF を有効にしたが、ネイバが一切表示されず経路が交換できない。",
+      "title": "OSPF ネイバが上がらない"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "静的ルートのネクストホップ誤り",
+        "デフォルトルートの欠落",
+        "DNS の名前解決失敗",
+        "NAT テーブルの溢れ"
+      ],
+      "domain": "routing",
+      "evidence": [
+        {
+          "body": "S 192.168.30.0/24 [1/0] via 10.0.12.2\nS 192.168.40.0/24 [1/0] via 10.0.23.9\nO 192.168.50.0/24 [110/2] via 10.0.12.2",
+          "label": "本社ルータ show ip route（抜粋）"
+        },
+        {
+          "body": "・192.168.30.0/24（R2 の先）へは到達できる\n・192.168.40.0/24（R3 の先）へだけ到達できない\n・R3 との間のリンクは 10.0.23.0/30 で、R3 側は 10.0.23.2\n・他の拠点・インターネットへの通信は正常",
+          "label": "到達性の確認結果"
+        }
+      ],
+      "explanation": "192.168.40.0/24 向けのネクストホップが 10.0.23.9 になっているが、そのアドレスはリンク上に存在しない（R3 は 10.0.23.2）。到達可能なネットワークが他にある以上、デフォルトルートや回線全体の問題ではない。ネクストホップを 10.0.23.2 に直す。",
+      "id": "c04",
+      "question": "192.168.40.0/24 へ届かない原因を選べ。",
+      "symptom": "本社から特定の拠点ネットワーク（192.168.40.0/24）へだけ通信できない。他の拠点へは正常に届く。",
+      "title": "特定のネットワークへだけ届かない"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "トランクが形成されていない",
+        "ネイティブ VLAN の不一致",
+        "STP でポートがブロッキングされている",
+        "DHCP スヌーピングによる遮断"
+      ],
+      "domain": "switching",
+      "evidence": [
+        {
+          "body": "%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on GigabitEthernet0/1 (20), with SW2 GigabitEthernet0/1 (1)",
+          "label": "スイッチのログ"
+        },
+        {
+          "body": "・VLAN 10、VLAN 30 の端末は棟間で通信できる（トランクは動作している）\n・VLAN 20 の端末だけ、対向棟の同じ VLAN 20 の端末と通信できない\n・両スイッチともトランクのカプセル化は 802.1Q",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "トランク自体は他の VLAN が通っている時点で動作している。タグなしで運ばれるネイティブ VLAN だけが、受信側で別の VLAN として扱われてしまうのがミスマッチの影響範囲。CDP の警告どおり、両端のネイティブ VLAN をそろえる。",
+      "id": "c05",
+      "question": "VLAN 20 だけ通信できない原因を選べ。",
+      "symptom": "2棟のスイッチ間トランクで、VLAN 20 の端末だけが対向棟と通信できない。他の VLAN は正常。スイッチのログには警告が出ている。",
+      "title": "特定の VLAN だけ棟間通信できない"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "静的 NAT の設定漏れ",
+        "DNS の A レコード誤り",
+        "ACL で 443 が許可されていない",
+        "Web サーバのサービス停止"
+      ],
+      "domain": "services-security",
+      "evidence": [
+        {
+          "body": "Extended IP access list WAN-IN\n 10 permit tcp any host 203.0.113.10 eq www\n 20 deny ip any any (1482 matches)",
+          "label": "境界ルータ show access-lists（抜粋）"
+        },
+        {
+          "body": "・社内からは https://www.example.co.jp にアクセスできる\n・社外からは http（80番）にはアクセスできるが、https（443番）がタイムアウトする\n・静的 NAT は設定済みで、80番の到達性で動作が確認できている",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "WAN 側 ACL が許可しているのは www（80）だけで、443 は暗黙の deny に落ちている（20番の deny のマッチ数が増えている）。NAT は 80 番が届く時点で機能しており、サーバも社内から https で応答している。ACL に 443 の許可を追加する。",
+      "id": "c06",
+      "question": "社外から https だけアクセスできない原因を選べ。",
+      "symptom": "社内の Web サーバをインターネットに公開したが、社外から https でアクセスできない。http ではアクセスできる。",
+      "title": "社外から https だけつながらない"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "プライオリティが両方とも同じ値",
+        "HSRP グループ番号の不一致",
+        "仮想 IP アドレスの重複登録",
+        "hello タイマの不一致"
+      ],
+      "domain": "routing",
+      "evidence": [
+        {
+          "body": "Vlan10 - Group 1\n  State is Active\n  Virtual IP address is 192.168.10.254\n  Priority 110",
+          "label": "ルータ A show standby brief 相当の抜粋"
+        },
+        {
+          "body": "Vlan10 - Group 2\n  State is Active\n  Virtual IP address is 192.168.10.254\n  Priority 100",
+          "label": "ルータ B show standby brief 相当の抜粋"
+        }
+      ],
+      "explanation": "グループ番号が違うと、2台は別の HSRP グループとしてそれぞれ独立に Active になる。仮想 IP が同じでも、グループが違えば互いを相手と認識しない。プライオリティの差（110 と 100）は本来の冗長動作のための設定で、両方 Active の原因にはならない。グループ番号をそろえる。",
+      "id": "c07",
+      "question": "両方が Active になってしまう原因を選べ。",
+      "symptom": "HSRP でゲートウェイを冗長化したはずが、2台のルータが両方とも Active になってしまった。",
+      "title": "HSRP で両系が Active になる"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "ポートセキュリティの違反による err-disable",
+        "ケーブルの接触不良",
+        "STP のブロッキング",
+        "スイッチのポート故障"
+      ],
+      "domain": "switching",
+      "evidence": [
+        {
+          "body": "Gi0/5  err-disabled  connected    10      a-full  a-100  10/100/1000BaseTX",
+          "label": "show interfaces status"
+        },
+        {
+          "body": "%PM-4-ERR_DISABLE: psecure-violation error detected on Gi0/5, putting Gi0/5 in err-disable state",
+          "label": "スイッチのログ"
+        },
+        {
+          "body": "・そのポートには、利用者が私物の小型ハブをつないで PC とプリンタの2台を接続していた\n・ポートセキュリティは最大 MAC 1つで設定されていた",
+          "label": "現地確認"
+        }
+      ],
+      "explanation": "ログが psecure-violation を明示している。最大1つのポートに2台目の機器がつながり、学習済みと異なる MAC が現れたため違反として err-disable になった。私物ハブの撤去（または台数に応じた設定変更）と、ポートの復旧（shut／no shut）が必要。",
+      "id": "c08",
+      "question": "このポートが止まった原因を選べ。",
+      "symptom": "ある利用者の端末だけ、朝から突然ネットワークにつながらなくなった。スイッチのポートを確認すると err-disabled になっている。",
+      "title": "1台だけ突然つながらない（ポート停止）"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "A レコードの誤り",
+        "メールサーバのサービス停止",
+        "MX レコードの未登録",
+        "SPF レコードの誤り"
+      ],
+      "domain": "services-security",
+      "evidence": [
+        {
+          "body": "www.example.co.jp  A  203.0.113.10（正常に応答）",
+          "label": "名前解決の確認（A レコード）"
+        },
+        {
+          "body": "example.co.jp  MX  （レコードが存在しない）",
+          "label": "名前解決の確認（MX レコード）"
+        },
+        {
+          "body": "・社内のメールサーバは稼働しており、社内同士の送受信はできる\n・Web サイトの閲覧は社外からも正常",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "メール配送は MX レコードで宛先サーバを引く。その MX が存在しないため、外部のサーバは配送先を特定できない。A レコードは Web が正常な時点で正しく、社内送受信ができる以上サーバも稼働している。MX レコードを登録する。",
+      "id": "c09",
+      "question": "メールだけ届かない原因を選べ。",
+      "symptom": "会社の Web サイトは社外から正常に見えるのに、社外からのメールだけが届かない。",
+      "title": "メールだけ届かない"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "新しい DHCP サーバの故障",
+        "DHCP スヌーピングの信頼（trust）設定漏れ",
+        "VLAN の割り当て誤り",
+        "アドレスプールの枯渇"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "・新サーバを検証用 PC に直結すると、アドレスは正常に配布される\n・新サーバがつながるスイッチポートは access ポートで、dhcp snooping trust の設定がない\n・スイッチのログに、DHCP サーバ応答を破棄した記録が残っている",
+          "label": "切り分け結果"
+        },
+        {
+          "body": "VLAN 10 の全端末がアドレスを取得できず、APIPA になっている",
+          "label": "障害の範囲"
+        }
+      ],
+      "explanation": "DHCP スヌーピングは、信頼されていないポートからの DHCP サーバ応答を不正サーバのものとして破棄する。正規サーバをつないだポートに trust 設定がないため、正規の応答まで捨てられていた。サーバ接続ポート（と上位リンク）に trust を設定する。",
+      "id": "c10",
+      "question": "アドレス配布が止まった原因を選べ。",
+      "symptom": "DHCP サーバを新しい機器に交換した直後から、その VLAN の全端末がアドレスを取得できなくなった。",
+      "title": "DHCP サーバ交換後に全端末が取れない"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "サーバのサブネットマスク設定誤り",
+        "サーバの IP アドレス重複",
+        "ファイアウォールによる遮断",
+        "DNS の逆引き未登録"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "IP アドレス: 192.168.1.130\nサブネットマスク: 255.255.255.128（/25）\nデフォルトゲートウェイ: 192.168.1.1\n※ このセグメントの正しいマスクは /24",
+          "label": "新サーバの設定"
+        },
+        {
+          "body": "・192.168.1.200 の端末からはサーバに応答がある\n・192.168.1.50 の端末からはサーバに応答がない\n・他のサーバへはどちらの端末からも通信できる",
+          "label": "到達性の確認結果"
+        }
+      ],
+      "explanation": "サーバが /25 と誤認すると、192.168.1.128/25 の範囲（.129〜.254）だけを同一サブネットとみなす。.50 の端末は「別サブネット」扱いになり、返信がゲートウェイ（.1）へ送られるが、そのゲートウェイ自体もサーバからは別サブネット扱いで到達できない。到達可否がアドレス帯で分かれるのがマスク誤りの典型的な現れ方。",
+      "id": "c11",
+      "question": "アドレス帯で到達可否が分かれる原因を選べ。",
+      "symptom": "新しいサーバを設置したところ、同じセグメントの一部の端末からだけ応答がない。到達できる端末とできない端末が、アドレスの範囲できれいに分かれている。",
+      "title": "一部の端末からだけサーバに応答がない"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "リンクの物理障害",
+        "ブロードキャストストームの発生",
+        "想定外のスイッチがルートブリッジになっている",
+        "DHCP サーバの応答遅延"
+      ],
+      "domain": "switching",
+      "evidence": [
+        {
+          "body": "Root ID    Priority  32778\n             Address   0019.aa12.3456\n             This bridge is the root",
+          "label": "会議室の旧スイッチ show spanning-tree（抜粋）"
+        },
+        {
+          "body": "・会議室に置かれた古い小型スイッチが、コアスイッチより小さい MAC アドレスを持っていた\n・コアスイッチの各ポートは、会議室方向を向いたルートポートになっている\n・全スイッチの STP プライオリティは未設定（デフォルト）",
+          "label": "現地確認"
+        }
+      ],
+      "explanation": "プライオリティが全台デフォルトだと、ブリッジ ID の比較は MAC アドレスの大小で決まり、最も小さい旧スイッチがルートブリッジに当選する。結果としてトラフィックが旧スイッチ経由に遠回りする。ブロードキャストストームは起きておらず、リンクも正常。コアスイッチのプライオリティを明示的に下げて（小さい値にして）ルートに固定するのが対処。",
+      "id": "c12",
+      "question": "経路が遠回りになる原因を選べ。",
+      "symptom": "フロアのネットワークが全体的に遅く、コアスイッチ同士を直結しているのに通信が会議室の旧スイッチを経由している。",
+      "title": "通信が旧スイッチを遠回りする"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "アクセス VLAN の設定誤り",
+        "トランクの設定誤り",
+        "DHCP サーバの障害",
+        "ケーブルの配線ミス"
+      ],
+      "domain": "switching",
+      "evidence": [
+        {
+          "body": "Gi0/12  access  VLAN 10\n（このフロアの端末用 VLAN は 20）",
+          "label": "スイッチ show interfaces switchport（抜粋）"
+        },
+        {
+          "body": "・同じスイッチの他の端末（VLAN 20）は正常\n・端末は 192.168.10.x のアドレスを取得している（VLAN 10 のセグメント）\n・ケーブルを差し替えても症状は変わらない",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "ポートのアクセス VLAN が旧フロア用の 10 のまま残っていたため、端末は VLAN 10 のセグメントにつながり、そちらのアドレスを取得していた。ポートの物理的な接続先は合っているので配線ミスではなく、ポート設定の問題。アクセス VLAN を 20 に直す。",
+      "id": "c13",
+      "question": "この端末だけつながらない原因を選べ。",
+      "symptom": "移設してきた端末1台だけが、業務サーバに接続できない。同じスイッチにつながる他の端末は正常に使えている。",
+      "title": "移設した端末だけつながらない"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "DR の障害",
+        "エリアの不一致",
+        "異常ではない（DROTHER 同士は 2WAY が正常）",
+        "hello タイマの不一致"
+      ],
+      "domain": "routing",
+      "evidence": [
+        {
+          "body": "Neighbor ID  Pri  State      Dead Time  Address      Interface\n10.0.0.2      1    FULL/DR    00:00:35   10.0.12.2    Gi0/0\n10.0.0.3      1    FULL/BDR   00:00:31   10.0.12.3    Gi0/0\n10.0.0.4      1    2WAY/DROTHER 00:00:38  10.0.12.4    Gi0/0",
+          "label": "show ip ospf neighbor"
+        },
+        {
+          "body": "・経路は全て学習できており、通信は正常\n・10.0.0.4 のルータとも経路交換はできている（DR 経由）",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "マルチアクセスネットワークでは、DROTHER 同士はデータベースを直接同期せず、DR／BDR とだけ FULL になる設計。DROTHER 間の状態が 2WAY で止まるのは正常動作で、経路も DR 経由で交換されている。隣接の状態表示だけで異常と判断しない。",
+      "id": "c14",
+      "question": "2WAY で止まっている隣接についての判断を選べ。",
+      "symptom": "OSPF のネイバ確認で、1台のルータとの状態が 2WAY のまま FULL にならない。障害かどうか判断したい。",
+      "title": "OSPF ネイバが 2WAY で止まる"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "近くの AP とのチャネル干渉",
+        "AP の故障",
+        "DHCP のプール枯渇",
+        "認証サーバの障害"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "・会議室の AP はチャネル 6、真上のフロアの AP もチャネル 6 で、互いに強く受信し合っている\n・会議室の端末の有線接続は正常\n・端末は IP アドレスを取得できており、認証も通っている",
+          "label": "無線の調査結果"
+        },
+        {
+          "body": "・他の会議室（チャネル 1 と 11 の AP）では問題が起きていない",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "2台の AP が同じチャネル 6 を強く受信し合うと、互いの通信が干渉して再送が増え、体感速度が落ちる。アドレス取得と認証は完了しているため DHCP や認証の問題ではない。チャネルを 1／6／11 の範囲でずらすのが対処。",
+      "id": "c15",
+      "question": "この会議室だけ無線が遅い原因を選べ。",
+      "symptom": "特定の会議室だけ、無線 LAN が遅く、時々切れる。他の部屋では問題がない。",
+      "title": "特定の会議室だけ無線が遅い"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "DNS サーバの応答遅延",
+        "PAT の変換用アドレス不足",
+        "社内回線の帯域不足",
+        "ACL による時間帯制限"
+      ],
+      "domain": "services-security",
+      "evidence": [
+        {
+          "body": "Hits: 1823405  Misses: 294812\nExpired translations: 811204\nDynamic mappings: Inside Source (pool WANPOOL: 203.0.113.10, refcount 4096)",
+          "label": "境界ルータ show ip nat statistics（抜粋）"
+        },
+        {
+          "body": "・利用者が増える夕方にだけ発生し、朝は正常\n・社内サーバ同士の通信は終日正常\n・回線の帯域使用率は 40% 程度で余裕がある",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "PAT の変換に使えるグローバルアドレスが1つだけで、利用者増に伴い変換テーブルを作れない Misses が大量に発生している。帯域には余裕があり、社内通信は正常。変換用アドレスのプールを増やすのが対処。",
+      "id": "c16",
+      "question": "夕方だけインターネットに出られない原因を選べ。",
+      "symptom": "夕方になると、社内からインターネットへの通信が頻繁に失敗する。朝の時間帯は正常。",
+      "title": "夕方だけインターネットが不安定"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "IPv6 アドレスの重複（手動設定の重なり）",
+        "RA（ルータ広告）が届いていない",
+        "DNS の AAAA レコード未登録",
+        "スイッチのポート障害"
+      ],
+      "domain": "infra",
+      "evidence": [
+        {
+          "body": "%IPV6-4-DUPLICATE: Duplicate address 2001:db8:10::5 on GigabitEthernet0/0",
+          "label": "ルータのログ"
+        },
+        {
+          "body": "・そのアドレスは、別のサーバにも手動で設定されていた\n・他の IPv6 機器は正常に通信している（RA は届いている）",
+          "label": "現地確認"
+        }
+      ],
+      "explanation": "ログがアドレス重複を明示している。DAD（重複アドレス検出）により、重複したアドレスは使用不可になる。手動設定した機器同士で同じアドレスを付けたのが原因で、どちらかのアドレスを変更する。",
+      "id": "c17",
+      "question": "この機器が IPv6 で通信できない原因を選べ。",
+      "symptom": "IPv6 アドレスを手動設定した機器が、IPv6 で通信できない。ログには警告が出ている。",
+      "title": "IPv6 アドレスを設定したのに通信できない"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "ネクストホップの到達性がない",
+        "バックアップ回線の帯域不足",
+        "静的ルートの AD が小さすぎる",
+        "OSPF のコストが高すぎる"
+      ],
+      "domain": "routing",
+      "evidence": [
+        {
+          "body": "ip route 0.0.0.0 0.0.0.0 10.0.99.2 90",
+          "label": "ルータの設定（バックアップ用静的ルート）"
+        },
+        {
+          "body": "S* 0.0.0.0/0 [90/0] via 10.0.99.2\nO*E2 0.0.0.0/0 [110/1] via 10.0.12.2",
+          "label": "show ip route（デフォルトルート）"
+        },
+        {
+          "body": "・メイン回線（OSPF）は正常に動作している\n・それでも全ての外部通信が低速なバックアップ回線を経由している",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "フローティングスタティックは、メイン経路（OSPF の AD 110）より大きい AD を付けて「普段は隠れておく」仕組み。AD 90 は 110 より小さいため、静的ルートが常時優先されてしまう。AD を 110 より大きく（例：200）設定する。",
+      "id": "c18",
+      "question": "バックアップ回線を常時使ってしまう原因を選べ。",
+      "symptom": "メイン回線が正常なのに、外部通信が低速なバックアップ回線ばかりを経由してしまう。バックアップ用に設定した静的ルートが原因らしい。",
+      "title": "普段からバックアップ回線を使ってしまう"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "TACACS+ サーバの停止",
+        "共有キー（shared secret）の不一致",
+        "ユーザアカウントの未登録",
+        "機器の時刻ずれ"
+      ],
+      "domain": "services-security",
+      "evidence": [
+        {
+          "body": "・TACACS+ サーバへは ping が通り、ポート 49 も開いている\n・同じユーザアカウントで、他の機器にはログインできる\n・サーバ側のログに、この機器からの認証要求が「key mismatch」で拒否された記録がある",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "サーバは稼働し到達性もあり、アカウントも他機器で使えている。残るは機器ごとに設定する共有キーの食い違いで、サーバ側ログがそれを示している。機器側の TACACS+ キーをサーバとそろえる。",
+      "id": "c19",
+      "question": "この機器だけ管理ログインできない原因を選べ。",
+      "symptom": "あるルータだけ、TACACS+ を使った管理ログインができなくなった。他の機器へは同じアカウントでログインできる。",
+      "title": "1台だけ管理ログインできない"
+    },
+    {
+      "answer": 0,
+      "choices": [
+        "EtherChannel の片側未設定による不整合",
+        "VLAN の不一致",
+        "STP の設定ミス",
+        "ケーブルの不良"
+      ],
+      "domain": "switching",
+      "evidence": [
+        {
+          "body": "%SW_MATM-4-MACFLAP_NOTIF: Host 0019.aa12.3456 in vlan 10 is flapping between port Gi0/1 and port Gi0/2",
+          "label": "スイッチのログ"
+        },
+        {
+          "body": "・SW1 側は Gi0/1 と Gi0/2 に channel-group 1（mode on）を設定済み\n・SW2 側には channel-group の設定が入っていない\n・リンク自体は両ポートとも up している",
+          "label": "設定の確認"
+        }
+      ],
+      "explanation": "片側だけ EtherChannel（mode on）にすると、SW1 は2本を1本の論理リンクとして扱うのに、SW2 は2本の独立リンクとして扱うため、MAC の学習が行き来してフラッピングが起きる。両側で同じ方式（LACP 等）にそろえて設定する。",
+      "id": "c20",
+      "question": "MAC フラッピングが起きる原因を選べ。",
+      "symptom": "2台のスイッチ間が不安定で、同じ MAC アドレスが2つのポートを行き来するログ（MAC フラッピング）が大量に出ている。",
+      "title": "スイッチ間が不安定で MAC が揺れる"
+    },
+    {
+      "answer": 2,
+      "choices": [
+        "syslog サーバの障害",
+        "機器の時刻設定のずれ",
+        "送信レベル（trap level）の設定",
+        "宛先 IP アドレスの誤り"
+      ],
+      "domain": "ai-ops",
+      "evidence": [
+        {
+          "body": "Trap logging: level warnings, 128 message lines logged\nLogging to 192.168.10.50 (udp port 514)",
+          "label": "ルータ show logging（抜粋）"
+        },
+        {
+          "body": "・サーバには他の機器からのログは届いている\n・届いていないのは severity 5（notification）のメッセージ\n・宛先と到達性は確認済み",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "trap level が warnings（重大度4）だと、サーバへ送られるのは重大度 0〜4 までで、5 の notification は送られない。サーバ側や宛先の問題ではなく、送信側のレベル設定。必要なら logging trap notifications（5）以上に上げる。",
+      "id": "c21",
+      "question": "特定のログだけ届かない原因を選べ。",
+      "symptom": "障害対応で確認したいログ（severity 5 のメッセージ）が、syslog サーバに残っていない。他の機器のログは届いている。",
+      "title": "特定のログだけサーバに残っていない"
+    },
+    {
+      "answer": 1,
+      "choices": [
+        "監視対象機器の故障",
+        "SNMP コミュニティ名の不一致",
+        "回線の帯域不足",
+        "DNS の名前解決失敗"
+      ],
+      "domain": "ai-ops",
+      "evidence": [
+        {
+          "body": "・監視サーバから機器へ ping は通る\n・同じ監視サーバで、他の機器の SNMP 監視は正常\n・機器の設定を確認すると、コミュニティ名が更改前の古い値のままだった",
+          "label": "切り分け結果"
+        }
+      ],
+      "explanation": "到達性があり、他機器の監視も正常な中で、この機器だけ応答がない。SNMP のコミュニティ名が一致しないと、機器はポーリングに応答しない（v2c では無言で破棄される）。コミュニティ名をサーバ側とそろえる。",
+      "id": "c22",
+      "question": "この機器だけ SNMP で監視できない原因を選べ。",
+      "symptom": "監視サーバが、ある機器からだけ SNMP の応答を得られない。死活監視（ping）は正常。",
+      "title": "1台だけ SNMP で監視できない"
+    }
+  ]
+}

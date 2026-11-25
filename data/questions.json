@@ -303,6 +303,96 @@
         1
       ],
       "choices": [
+        "ポート番号の割り振り",
+        "コネクタの汚れや損傷による光信号の減衰",
+        "IP アドレスの設定",
+        "VLAN の割り当て"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "光ファイバはコネクタ端面の汚れや傷で受信レベルが下がり、エラーやリンクダウンの原因になる。インターフェース／ケーブル診断（1.1）では、信号レベルと物理状態の確認が基本になる。",
+      "id": "q116",
+      "stem": "光ファイバ接続で、リンクが不安定になったり受信エラーが増えたりする物理的な原因として典型的なものはどれか。",
+      "subtopic": "1.1 光ファイバの信号とコネクタ",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "192.168.1.0",
+        "192.168.1.64",
+        "192.168.1.127",
+        "192.168.1.255"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "/26 のブロックは 64 刻み。.64 のネットワークは .64〜.127 で、末尾の .127 がブロードキャストアドレス。ネットワークアドレス（.64）と対で覚える。",
+      "id": "q117",
+      "stem": "ネットワーク 192.168.1.64/26 のブロードキャストアドレスはどれか。",
+      "subtopic": "1.3 ブロードキャストアドレスの計算",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "Discover → Offer → Request → Ack",
+        "Offer → Discover → Ack → Request",
+        "Request → Discover → Offer → Ack",
+        "Ack → Offer → Request → Discover"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "DHCPv4 のアドレス取得は DORA の順：クライアントの Discover、サーバの Offer、クライアントの Request、サーバの Ack。途中で止まる段階を見れば、リレー・サーバ・応答のどこで詰まっているか切り分けられる。",
+      "id": "q118",
+      "stem": "DHCPv4 でアドレスを取得する際のメッセージの順序として正しいものはどれか。",
+      "subtopic": "1.7 DHCP の動作（DORA）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "2.4GHz より到達距離が長い",
+        "使えるチャネル数が多く、干渉を受けにくい",
+        "障害物を回り込む性質が強い",
+        "古い端末との互換性が高い"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "5GHz 帯はチャネル数が多く混雑しにくい反面、直進性が強く、壁などの障害物で減衰しやすいため到達距離は短め。2.4GHz は遠くまで届くが干渉源も多い。帯域の使い分けはこの特性で判断する。",
+      "id": "q119",
+      "stem": "5GHz 帯の無線 LAN の特徴として正しいものはどれか。",
+      "subtopic": "1.5 無線の帯域特性",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "デフォルトゲートウェイの誤り",
+        "DHCP サーバの停止",
+        "DNS サーバの設定誤り",
+        "無線の電波強度不足"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "IP アドレスでの通信（ping）ができて名前でだけ失敗するのは、名前解決の問題。ゲートウェイや回線が壊れていれば IP でも通らない。クライアントの DNS 設定を確認する。",
+      "id": "q120",
+      "stem": "クライアントからサーバへ IP アドレスでは ping が通るのに、ホスト名ではアクセスできない。疑うべき設定はどれか。",
+      "subtopic": "1.6 クライアント接続（名前解決）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
         "リンクが即座にダウンし、トランクは形成されない",
         "CDP がミスマッチを警告し、タグなしフレームが相手側の想定外の VLAN に届く恐れがある",
         "自動的に小さい方の VLAN 番号に統一される",
@@ -567,6 +657,97 @@
       "id": "q215",
       "stem": "トラブルシュートでパケットキャプチャの出力を読むと分かることはどれか。",
       "subtopic": "2.4 パケットキャプチャ",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "1〜255",
+        "1〜1005",
+        "1024〜4094",
+        "制限はない"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "通常範囲（normal range）は 1〜1005 で、この範囲は VLAN データベースに保存される標準的な VLAN。1006〜4094 は拡張範囲（extended range）。",
+      "id": "q216",
+      "stem": "VLAN の通常範囲（normal range）はどれか。",
+      "subtopic": "2.2 VLAN の範囲",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0,
+        2
+      ],
+      "choices": [
+        "接続している機器の IP アドレス",
+        "スイッチの内部温度",
+        "そのポートの接続先機器の機種やポート番号",
+        "スイッチの消費電力"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "CDP では隣接機器のデバイス名、接続ポート、IP アドレス、機種や IOS のバージョンなどが分かる。温度や消費電力のような環境情報は CDP の対象ではない。",
+      "id": "q217",
+      "stem": "CDP で確認できる情報を2つ選べ。",
+      "subtopic": "2.3 CDP で得られる情報",
+      "type": "multi"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "5つ（Initial、Blocking、Listening、Learning、Forwarding）",
+        "3つ（Discarding、Learning、Forwarding）",
+        "2つ（Blocking、Forwarding）",
+        "4つ（Blocking、Listening、Disabled、Forwarding）"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "Rapid PVST+（RSTP 系）は状態を Discarding／Learning／Forwarding の3つに整理した。従来 STP の Blocking と Listening が Discarding に統合され、収束が速くなった。",
+      "id": "q218",
+      "stem": "Rapid PVST+ のポート状態の組み合わせとして正しいものはどれか。",
+      "subtopic": "2.5 Rapid PVST+ のポート状態",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "スイッチの電源が入っていること",
+        "管理者権限でログインしていること",
+        "対象 VLAN が存在し、その VLAN でアクティブなポートがあること",
+        "STP が無効化されていること"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "SVI は、対応する VLAN が作成されていて、その VLAN に属するポート（アクセスまたはトランク）がリンクアップしていないと up/up にならない。SVI が down のままのときは、この条件を順に確認する。",
+      "id": "q219",
+      "stem": "SVI が up/up になるために必要な条件はどれか。",
+      "subtopic": "2.1 SVI の up 条件",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "802.3af（PoE）と 802.3at（PoE+）",
+        "802.1Q と 802.1D",
+        "802.11a と 802.11b",
+        "802.3u と 802.3z"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "PoE の規格は 802.3af（最大 15.4W）と 802.3at（PoE+、最大 30W）。接続する機器（AP、IP 電話、カメラ）の消費電力に合う規格のポートを用意する。802.1Q はトランク、802.11 系は無線 LAN の規格。",
+      "id": "q220",
+      "stem": "PoE の規格として正しい組み合わせはどれか。",
+      "subtopic": "2.2 PoE の規格",
       "type": "single"
     },
     {
@@ -838,6 +1019,96 @@
       "id": "q015",
       "stem": "IPv4 のホストルートを表すプレフィックス長はどれか。",
       "subtopic": "3.2 ホストルート",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "DR の選出方法が同じ",
+        "broadcast では DR／BDR を選出するが、point-to-point では選出しない",
+        "point-to-point ではエリアを使わない",
+        "broadcast では hello を送らない"
+      ],
+      "domain": "routing",
+      "examVersion": "v2.0",
+      "explanation": "マルチアクセス（broadcast）では DR／BDR が隣接の中心になる。1対1の point-to-point では選出自体が不要で、その分ネイバ確立も速い。エリアの使い方や hello の送信はどちらのタイプでも共通。",
+      "id": "q016",
+      "stem": "OSPF のネットワークタイプ broadcast と point-to-point の違いとして正しいものはどれか。",
+      "subtopic": "3.3 OSPF のネットワークタイプ",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "手動設定 → ループバックの最大アドレス → 物理インターフェースの最大アドレス",
+        "物理インターフェースの最大アドレス → 手動設定 → ループバック",
+        "起動した順に若いインターフェース",
+        "ランダムに決まる"
+      ],
+      "domain": "routing",
+      "examVersion": "v2.0",
+      "explanation": "ルータ ID は、手動設定（router-id コマンド）が最優先。なければループバックインターフェースの最大 IP、それもなければ物理インターフェースの最大 IP が選ばれる。再現性のため手動設定が推奨される。",
+      "id": "q017",
+      "stem": "OSPF のルータ ID の決定順序として正しいものはどれか。",
+      "subtopic": "3.3 ルータ ID の決定",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "静的ルートは常に動的ルートより優先される",
+        "ネクストホップへの経路が存在しないと、静的ルートはテーブルに載らない",
+        "静的ルートはメトリックを持たない",
+        "静的ルートは再帰参照ができない"
+      ],
+      "domain": "routing",
+      "examVersion": "v2.0",
+      "explanation": "静的ルートは、ネクストホップへの到達性がルーティングテーブルで解決できて初めて有効になる（再帰参照）。ネクストホップに届く経路が消えると、その静的ルートもテーブルから消える。",
+      "id": "q018",
+      "stem": "静的ルートの動作として正しいものはどれか。",
+      "subtopic": "3.2 静的ルートと再帰参照",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "0000.0c07.acXX の XX は IP アドレスの下位",
+        "0000.0c07.acXX の XX は VLAN 番号",
+        "0000.0c07.acXX の XX は HSRP グループ番号",
+        "仮想 MAC はルータの実 MAC と同じ"
+      ],
+      "domain": "routing",
+      "examVersion": "v2.0",
+      "explanation": "HSRP の仮想 MAC は 0000.0c07.ac の後にグループ番号（16進2桁）が続く形式。グループ番号が違うと仮想 MAC も別物になり、c07 のケースのように別グループとして動作してしまう。",
+      "id": "q019",
+      "stem": "HSRP の仮想 MAC アドレスについて正しいものはどれか。",
+      "subtopic": "3.4 HSRP の仮想 MAC",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "発信インターフェースの指定も必要になる",
+        "グローバルアドレスでは設定できない",
+        "AD を必ず 1 にする",
+        "ルータ ID が必要になる"
+      ],
+      "domain": "routing",
+      "examVersion": "v2.0",
+      "explanation": "リンクローカルアドレスはそのリンクでしか意味を持たないため、どのリンクのネクストホップなのかを発信インターフェースで特定する必要がある。IPv6 の静的ルートでよくある設定漏れ。",
+      "id": "q020",
+      "stem": "IPv6 の静的ルートで、ネクストホップにリンクローカルアドレスを指定する場合に必要なことはどれか。",
+      "subtopic": "3.2 IPv6 静的ルート",
       "type": "single"
     },
     {
@@ -1117,6 +1388,96 @@
         1
       ],
       "choices": [
+        "宛先アドレスを反転させたもの",
+        "「どこまで一致すれば許可か」を表す、通常のサブネットマスクとはビットの意味が逆の値",
+        "ポート番号の範囲指定",
+        "プロトコル番号の一覧"
+      ],
+      "domain": "services-security",
+      "examVersion": "v2.0",
+      "explanation": "ワイルドカードマスクは、0 のビットが「一致必須」、1 のビットが「無視」を表し、サブネットマスクとは 0／1 の意味が逆。例：192.168.1.0/24 の範囲は 0.0.0.255 と書く。",
+      "id": "q416",
+      "stem": "ACL のワイルドカードマスクとは何か。",
+      "subtopic": "4.6 ワイルドカードマスク",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "1〜99",
+        "100〜199",
+        "200〜299",
+        "1000〜1099"
+      ],
+      "domain": "services-security",
+      "examVersion": "v2.0",
+      "explanation": "番号付き標準 ACL は 1〜99（拡張範囲 1300〜1999）。拡張 ACL は 100〜199（拡張範囲 2000〜2699）。番号の範囲で ACL の種類が決まる。",
+      "id": "q417",
+      "stem": "番号付き標準 ACL に使える番号の範囲はどれか。",
+      "subtopic": "4.6 ACL の番号範囲",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "機器へのログイン試行の回数を制限する",
+        "誰が・いつ・何をしたかを記録し、後から追跡できるようにする",
+        "パスワードを暗号化して保存する",
+        "ログインできる時間帯を制限する"
+      ],
+      "domain": "services-security",
+      "examVersion": "v2.0",
+      "explanation": "AAA の3要素は、認証（Authentication：誰か）、認可（Authorization：何をしてよいか）、アカウンティング（Accounting：何をしたかの記録）。アカウンティングの記録は、障害調査や監査で操作の追跡に使われる。",
+      "id": "q418",
+      "stem": "AAA のアカウンティング（Accounting）の役割はどれか。",
+      "subtopic": "4.1 AAA のアカウンティング",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "TFTP より転送速度が速いため",
+        "設定ファイルを自動で世代管理できるため",
+        "SSH の暗号化通信の上で転送でき、平文で流れないため",
+        "追加のライセンスが不要なため"
+      ],
+      "domain": "services-security",
+      "examVersion": "v2.0",
+      "explanation": "SFTP／SCP は SSH を土台にするため、認証情報もファイル内容も暗号化される。TFTP や FTP は平文で、盗聴や改ざんへの耐性がない。速度や世代管理はこの選択の理由ではない。",
+      "id": "q419",
+      "stem": "機器のファイル転送に SFTP／SCP を使う理由として正しいものはどれか。",
+      "subtopic": "4.2 安全なファイル転送の理由",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "VTY 回線に SSH のみを許可し、アクセス ACL を適用する",
+        "Telnet を許可し、パスワードを長くする",
+        "コンソールポートを常時開放する",
+        "enable パスワードを共有する"
+      ],
+      "domain": "services-security",
+      "examVersion": "v2.0",
+      "explanation": "リモート管理は、平文の Telnet を止めて SSH のみにし、VTY に ACL をかけて接続元を絞るのが基本。パスワードの長さだけでは平文通信の盗聴は防げない。",
+      "id": "q420",
+      "stem": "機器へのリモート管理アクセスを安全にする設定として適切なものはどれか。",
+      "subtopic": "4.1 管理アクセスの保護",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
         "質問に文章で答えるだけの仕組み",
         "目標を与えると、計画を立て、ツールを実行しながら複数ステップの作業を自律的に進める仕組み",
         "ネットワーク機器のファームウェアの一種",
@@ -1381,6 +1742,114 @@
       "id": "q515",
       "stem": "Ansible のプレイブックが記述される形式はどれか。",
       "subtopic": "5.5 Ansible のプレイブック",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "対象機器の IP アドレスの一覧",
+        "管理対象の機器やグループを定義したファイル",
+        "プレイブックの実行結果の要約",
+        "暗号鍵の保管場所"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "インベントリは、Ansible が操作する対象ホストやグループを定義したもの。プレイブック（手順）とインベントリ（対象）が分かれているため、同じ手順を別拠点の機器群にも使い回せる。",
+      "id": "q521",
+      "stem": "Ansible のインベントリとは何か。",
+      "subtopic": "5.5 Ansible のインベントリ",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "機器の台数を減らせる",
+        "設定ファイルを自動で圧縮できる",
+        "手順をコード化して繰り返し実行でき、人手作業のミスやばらつきを減らせる",
+        "ベンダのサポート契約が不要になる"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "自動化の価値は、同じ手順を何度でも同じ品質で実行できること。手作業の入力ミスや設定のばらつきが減り、変更履歴もコードとして残る。台数や契約の話ではない。",
+      "id": "q522",
+      "stem": "ネットワーク運用を自動化する利点として最も適切なものはどれか。",
+      "subtopic": "5.3 自動化ベースの管理",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "機器の状態を表す項目（OID で識別される管理情報）の集まり",
+        "ログファイルを圧縮した形式",
+        "ルーティングテーブルの別名",
+        "ファームウェアの版数表"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "MIB は、SNMP で監視できる項目（インターフェースの流量、カウンタ、状態など）を OID という識別子で体系化したもの。監視サーバは OID を指定して値を取得する。",
+      "id": "q523",
+      "stem": "SNMP の MIB とは何か。",
+      "subtopic": "5.4 SNMP の MIB",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "そのまま本番手順として即座に実行する",
+        "事実確認と検証を行い、根拠を確認してから使う",
+        "文字数が多いほど正しいと判断する",
+        "出典を尋ねても意味がないので聞かない"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "生成 AI は、もっともらしいが誤った内容（ハルシネーション）を返すことがある。運用の判断に使う前に、公式ドキュメントや実機の出力で裏付けるのが前提。効率化の道具であって、検証の省略にはならない。",
+      "id": "q524",
+      "stem": "生成 AI の回答をネットワーク運用の判断に使う際の注意点として正しいものはどれか。",
+      "subtopic": "5.1／5.2 AI 回答の検証",
+      "type": "single"
+    },
+    {
+      "answer": [
+        2
+      ],
+      "choices": [
+        "重大度 5 はデバッグ情報を表す",
+        "CONFIG_I はルーティングの収束を示す",
+        "重大度 5（通知）で、設定変更が行われたことを記録するメッセージ",
+        "重大度 5 は最も重大な障害を表す"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "%SYS-5-CONFIG_I は、SYS ファシリティ、重大度 5（notification：通常だが有意な状態）、ニーモニック CONFIG_I で、「設定が変更された」という記録。障害ではなく、変更履歴の追跡に使うメッセージ。",
+      "id": "q525",
+      "stem": "syslog メッセージ「%SYS-5-CONFIG_I: Configured from console by admin」の解釈として正しいものはどれか。",
+      "subtopic": "5.6 syslog メッセージの解釈",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "機器が NTP で時刻同期していること",
+        "機器のホスト名が一意であること",
+        "syslog の重大度を 0 に固定すること",
+        "ログをローカルに保存しないこと"
+      ],
+      "domain": "ai-ops",
+      "examVersion": "v2.0",
+      "explanation": "複数機器のログを突き合わせて時系列を追うには、各機器の時刻がそろっていることが前提になる。時刻がずれると、障害の前後関係を誤読する。NTP による同期はログ運用の土台。",
+      "id": "q526",
+      "stem": "複数機器の syslog を突き合わせて障害調査をするために重要な前提はどれか。",
+      "subtopic": "5.6 ログの時刻同期",
       "type": "single"
     }
   ]

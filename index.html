@@ -62,7 +62,7 @@
     <div style="margin-top:40px;">
       <button class="btn primary" id="btn-start">▶ はじめる</button>
     </div>
-    <p class="ver">ver. 0.4（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+    <p class="ver">ver. 0.5（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
   </section>
 
   <!-- メニュー選択 -->
@@ -70,7 +70,8 @@
     <div class="head"><button class="back" data-go="scr-title">← 戻る</button><h2>メニュー</h2></div>
     <button class="btn" id="btn-exam">試験対策編<span class="cnt" id="cnt-exam"></span></button>
     <button class="btn" id="btn-field">現場実践編<span class="cnt" id="cnt-field"></span></button>
-    <p class="note">現場実践編は、症状と観測情報から原因を特定するケース問題です。</p>
+    <p class="note">現場実践編は、症状と観測情報から原因を特定するケース問題です。学習記録（分野ベスト・解決済みケース）はこの端末に保存されます。</p>
+    <button class="btn" id="btn-reset">学習記録をリセット<span class="cnt">ベスト・解決済みを消去</span></button>
   </section>
 
   <!-- 分野選択 -->
@@ -157,14 +158,14 @@ function buildDomains(){
     b.innerHTML = "";
     b.appendChild(document.createTextNode(d.name + "（" + d.weight + "%）"));
     const c = document.createElement("span"); c.className = "cnt";
-    c.textContent = n ? n + "問" : "準備中"; b.appendChild(c);
+    c.textContent = n ? n + "問" + (PROG.best[d.id] ? "・ベスト" + PROG.best[d.id] : "") : "準備中"; b.appendChild(c);
     b.addEventListener("click", () => startQuiz(d.id));
     list.appendChild(b);
   });
 }
 function startQuiz(domainId){
   const qs = DATA.questions.filter(q => q.domain === domainId);
-  quiz = { list: qs, idx: 0, score: 0, picked: new Set(), locked: false };
+  quiz = { list: qs, idx: 0, score: 0, picked: new Set(), locked: false, domain: domainId };
   renderQ(); show("scr-quiz");
 }
 function renderQ(){
@@ -210,15 +211,37 @@ $("btn-answer").addEventListener("click", () => {
 $("btn-next").addEventListener("click", () => {
   if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
   else {
+    const prev = PROG.best[quiz.domain] || 0;
     $("result-score").textContent = quiz.score + " / " + quiz.list.length + " 問正解";
-    $("result-note").textContent = quiz.score === quiz.list.length ? "全問正解です。" : "間違えた問題は解説を読み直してみてください。";
+    $("result-note").textContent = quiz.score === quiz.list.length ? "全問正解です。" :
+      (quiz.score > prev ? "この分野のベストを更新しました。" : "間違えた問題は解説を読み直してみてください。");
+    if (quiz.score > prev){ PROG.best[quiz.domain] = quiz.score; saveProg(); buildDomains(); }
     show("scr-result");
   }
 });
 
+/* ===== 学習記録（localStorage） ===== */
+let PROG = { solved: [], best: {} };
+try {
+  const raw = localStorage.getItem("route301-progress-v1");
+  if (raw) PROG = Object.assign(PROG, JSON.parse(raw));
+} catch(e) {}
+function saveProg(){
+  PROG.solved = [...solvedCases];
+  try { localStorage.setItem("route301-progress-v1", JSON.stringify(PROG)); } catch(e) {}
+}
+$("btn-reset").addEventListener("click", () => {
+  if (!confirm("学習記録（分野ベストと解決済みケース）を消去しますか？")) return;
+  PROG = { solved: [], best: {} };
+  solvedCases.clear();
+  try { localStorage.removeItem("route301-progress-v1"); } catch(e) {}
+  buildDomains();
+  if (CASES) buildCaseList();
+});
+
 /* ===== 現場実践編 ===== */
 let CASES = null, curCase = null;
-const solvedCases = new Set();
+const solvedCases = new Set(PROG.solved || []);
 const DOMAIN_TAG = { "infra":"分野1", "switching":"分野2", "routing":"分野3",
   "services-security":"分野4", "ai-ops":"分野5" };
 async function loadCases(){
@@ -281,7 +304,7 @@ $("btn-case-answer").addEventListener("click", () => {
   curCase.locked = true;
   const c = curCase.data;
   const ok = curCase.picked === c.answer;
-  if (ok) solvedCases.add(c.id);
+  if (ok){ solvedCases.add(c.id); saveProg(); }
   [...$("case-choices").children].forEach((el, j) => {
     if (j === c.answer) el.classList.add("correct");
     else if (j === curCase.picked) el.classList.add("wrong");
