@@ -30,6 +30,367 @@
   "questions": [
     {
       "answer": [
+        1
+      ],
+      "choices": [
+        "ケーブルの断線",
+        "duplex（デュプレックス）のミスマッチ",
+        "IP アドレスの重複",
+        "STP のループ"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "片側が全二重、片側が半二重で動作すると、半二重側では遅延コリジョン（late collision）、全二重側では FCS／CRC エラーが増え、通信できても極端に遅くなる。show interfaces のカウンタと両端の duplex 設定を突き合わせるのが切り分けの基本。",
+      "id": "q101",
+      "stem": "スイッチとルータを接続したリンクで、通信はできるが極端に遅い。半二重で動作している側では late collision（遅延コリジョン）が、全二重側では FCS エラーが増加している。最も可能性が高い原因はどれか。",
+      "subtopic": "1.1 インターフェース／ケーブル障害の診断",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "マルチモードファイバ",
+        "シングルモードファイバ",
+        "カテゴリ5e UTP ケーブル",
+        "同軸ケーブル"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "シングルモードファイバはコア径が細く、長距離伝送に向く（数km〜）。マルチモードは構内などの短距離向け、UTP は 100m が上限。距離と信号減衰の観点から媒体を選ぶのが 1.1 の要点。",
+      "id": "q102",
+      "stem": "1.5km 離れた2つの建物の間を光ファイバで接続する。最も適した媒体はどれか。",
+      "subtopic": "1.1 ケーブル種別と距離",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "タイプ1（ベアメタル型）",
+        "タイプ2（ホスト型）",
+        "コンテナランタイム",
+        "ターミナルエミュレータ"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "タイプ1ハイパーバイザはハードウェア上で直接動作し、間にホスト OS を挟まないため、サーバ仮想化の基盤として使われる。タイプ2は既存の OS 上でアプリケーションとして動作する。",
+      "id": "q103",
+      "stem": "ハイパーバイザのうち、ホスト OS を介さずハードウェア上で直接動作するものはどれか。",
+      "subtopic": "1.2 ハイパーバイザの種類",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "各コンテナが専用のゲスト OS とカーネルを持つ",
+        "ホスト OS のカーネルを共有し、ゲスト OS を持たないため軽量で起動が速い",
+        "動作には必ずハイパーバイザが必要である",
+        "仮想マシンより消費リソースが大きい"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "コンテナはホスト OS のカーネルを共有し、プロセスとして隔離される。そのためゲスト OS 分のオーバーヘッドがなく、軽量で起動も速い。仮想マシンは台ごとにゲスト OS を持ち、より強い隔離が得られる。",
+      "id": "q104",
+      "stem": "仮想マシンと比較したコンテナの特徴として正しいものはどれか。",
+      "subtopic": "1.2 コンテナと仮想マシン",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "192.168.1.0",
+        "192.168.1.64",
+        "192.168.1.70",
+        "192.168.1.128"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "/26 のブロックサイズは 64。ネットワークは .0、.64、.128、.192 と区切られるため、.70 が属するネットワークは .64。ブロードキャストは .127、使用可能範囲は .65〜.126。",
+      "id": "q105",
+      "stem": "ホスト 192.168.1.70/26 が属するネットワークアドレスはどれか。",
+      "subtopic": "1.3 IPv4 サブネット計算",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "DNS サーバに到達できないため",
+        "デフォルトゲートウェイが自サブネットの範囲外にあるため",
+        "DHCP サーバが停止しているため",
+        "ケーブルがクロス結線になっているため"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "/25 では 192.168.1.128/25 の使用可能範囲は .129〜.254。ゲートウェイの 192.168.1.1 は反対側のサブネット（.0/25）に属するため、PC はゲートウェイ自体に到達できない。ゲートウェイは必ず自サブネット内に置く。",
+      "id": "q106",
+      "stem": "PC に 192.168.1.130/25 を設定し、デフォルトゲートウェイを 192.168.1.1 としたが、他のネットワークへ通信できない。原因はどれか。",
+      "subtopic": "1.3 IPv4 設定のトラブルシュート",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "2001:db8::ff00:42:8329",
+        "2001:db8::ff00::42:8329",
+        "2001:db8::ff00:42:83290",
+        "2001:db8::ff00:42:832"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "「::」によるゼロ圧縮は1つのアドレスで1回だけ使える。B は2回使っているため不正。C は最終グループが5桁で不正。D は末尾が 832 になっており、元の 8329 と値が異なるため別アドレスになる。正解の A は先行ゼロの省略と1回の「::」圧縮を正しく使っている。",
+      "id": "q107",
+      "stem": "IPv6 アドレス 2001:0db8:0000:0000:0000:ff00:0042:8329 の省略表記として正しいものはどれか。",
+      "subtopic": "1.4 IPv6 アドレス表記",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "1、2、3",
+        "1、6、11",
+        "5、7、9",
+        "11、12、13"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "2.4GHz 帯のチャネルは互いに重なっており、干渉を避けて同時に使える組み合わせは 1、6、11。隣接チャネル同士は部分的に重なるため、近くの AP とはこの3つの範囲で割り当てる。",
+      "id": "q108",
+      "stem": "2.4GHz 帯の無線 LAN で、互いに干渉しないチャネルの組み合わせはどれか。",
+      "subtopic": "1.5 無線の原理（チャネル選択）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "ipconfig /all",
+        "ping -t",
+        "tracert",
+        "netstat -a"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "ipconfig /all で IP アドレス、サブネットマスク、デフォルトゲートウェイに加え、DNS サーバや DHCP の情報までまとめて確認できる。クライアント接続の切り分けでは、まず IP 設定の確認から始める。",
+      "id": "q109",
+      "stem": "Windows クライアントで、IP アドレス・サブネットマスク・デフォルトゲートウェイ・DNS サーバをまとめて確認するコマンドはどれか。",
+      "subtopic": "1.6 クライアント接続の確認",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "ip helper-address（DHCP サーバのアドレス）",
+        "ip dhcp pool の作成",
+        "spanning-tree portfast",
+        "switchport mode trunk"
+      ],
+      "domain": "infra",
+      "examVersion": "v2.0",
+      "explanation": "169.254.x.x は APIPA（リンクローカル）のアドレスで、DHCP でアドレスを取得できなかったサイン。DHCP の要求はブロードキャストのため別サブネットのサーバには届かない。ゲートウェイ（SVI）に ip helper-address を設定すると、要求がユニキャストでサーバへ中継される（DHCP リレー）。",
+      "id": "q110",
+      "stem": "ある VLAN のクライアントが 169.254.x.x のアドレスしか取得できない。DHCP サーバは別のサブネットにあり、クライアントのゲートウェイである SVI には中継の設定がない。SVI に必要な設定はどれか。",
+      "subtopic": "1.7 DHCPv4 リレーのトラブルシュート",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "リンクが即座にダウンし、トランクは形成されない",
+        "CDP がミスマッチを警告し、タグなしフレームが相手側の想定外の VLAN に届く恐れがある",
+        "自動的に小さい方の VLAN 番号に統一される",
+        "DTP により両端ともアクセスポートに変わる"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "ネイティブ VLAN が両端で異なると、CDP が Native VLAN mismatch を警告する。タグなしフレームは受信側のネイティブ VLAN で処理されるため、意図しない VLAN へフレームが漏れる（VLAN リーク）恐れがあり、セキュリティ上も問題になる。両端で一致させるのが原則。",
+      "id": "q201",
+      "stem": "2台のスイッチ間トランクで、両端のネイティブ VLAN が異なる設定になっている。起こりうる事象はどれか。",
+      "subtopic": "2.1 トランクとネイティブ VLAN",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "両端とも passive",
+        "片側 active、片側 passive",
+        "片側 on、片側 passive",
+        "両端とも auto"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "LACP では少なくとも一方が active でないと交渉が始まらないため、passive 同士ではチャネルは形成されない。on は LACP を使わず無条件に束ねるモードで、LACP のモードではない。auto は PAgP 側のモード名。",
+      "id": "q202",
+      "stem": "LACP で EtherChannel を形成できるモードの組み合わせはどれか。",
+      "subtopic": "2.1 EtherChannel（LACP）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "物理インターフェースを束ねるための仮想インターフェース",
+        "VLAN ごとの論理的なレイヤ3インターフェースで、その VLAN のホストのゲートウェイになる",
+        "コンソール接続専用の管理インターフェース",
+        "STP のルートブリッジを示す識別子"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "SVI（Switch Virtual Interface）は VLAN に対応する L3 インターフェース。マルチレイヤスイッチでは、SVI に IP アドレスを設定するとその VLAN のホストのデフォルトゲートウェイとして動作し、VLAN 間ルーティングが可能になる。",
+      "id": "q203",
+      "stem": "SVI（Switch Virtual Interface）の説明として正しいものはどれか。",
+      "subtopic": "2.1 SVI",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "Ethernet ケーブル経由で、アクセスポイントや IP 電話へデータと電力を一緒に供給できる",
+        "2本のケーブルで帯域を2倍にできる",
+        "通信を暗号化して盗聴を防げる",
+        "1つのポートで複数の VLAN を扱える"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "PoE（Power over Ethernet）は、データ通信に使う Ethernet ケーブルで電力も供給する仕組み。電源の取りにくい場所のアクセスポイントや IP 電話、天井のカメラなどを、電源工事なしに設置できる。",
+      "id": "q204",
+      "stem": "PoE（Power over Ethernet）の説明として正しいものはどれか。",
+      "subtopic": "2.2 PoE",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "そのポートをトランクポートに設定する",
+        "アクセスポートにデータ用 VLAN と音声 VLAN の両方を設定する",
+        "電話と PC それぞれに物理ポートを分けなければ構成できない",
+        "電話とスイッチの間で EtherChannel を組む"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "IP 電話は音声を音声 VLAN、背後の PC の通信をデータ VLAN に分けて中継する。スイッチ側はアクセスポートのまま、音声 VLAN を併せて設定するのが標準的な構成で、ポートをトランク化する必要はない。",
+      "id": "q205",
+      "stem": "1つのスイッチポートに IP 電話を接続し、電話の背後に PC をつなぐ。音声とデータを別 VLAN に分けるためのスイッチ側の設定はどれか。",
+      "subtopic": "2.2 音声 VLAN（エッジポート属性）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0
+      ],
+      "choices": [
+        "show cdp neighbors detail",
+        "show vlan brief",
+        "show ip route",
+        "show spanning-tree"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "CDP は隣接する Cisco 機器の機器名、接続ポート、IP アドレスなどを教えてくれるため、実際の配線と構成図の突き合わせに使える。ベンダー混在環境では LLDP（show lldp neighbors）を使う。",
+      "id": "q206",
+      "stem": "構成図（ネットワークドキュメント）の正確性を検証するため、実際に接続されている隣接機器とそのポートを確認したい。適したコマンドはどれか。",
+      "subtopic": "2.3 CDP／LLDP によるドキュメント検証",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "通常の ping",
+        "拡張 ping",
+        "traceroute",
+        "show interfaces"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "拡張 ping では送信元アドレス／インターフェース、パケットサイズ、回数などを指定できる。特定の送信元からでないと再現しない到達性の問題を切り分けるのに使う。traceroute は経路の確認が主目的。",
+      "id": "q207",
+      "stem": "到達性の切り分けで、送信元インターフェースを指定して疎通を確認したい。適した手段はどれか。",
+      "subtopic": "2.4 切り分けツール（拡張 ping）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "ポート番号が最も小さいポート",
+        "ルートブリッジへの累積コストが最小になるポート",
+        "常にブロッキング状態になるポート",
+        "DR に選ばれたポート"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "ルートポートは、非ルートスイッチごとに1つ選ばれる「ルートブリッジへの最短路」のポート。受信した BPDU のパスコストを比較して決まる。DR は OSPF の用語で STP にはない。",
+      "id": "q208",
+      "stem": "Rapid PVST+ におけるルートポートの説明として正しいものはどれか。",
+      "subtopic": "2.5 Rapid PVST+（ルートポート）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        1
+      ],
+      "choices": [
+        "MAC アドレスが最も大きいスイッチ",
+        "ブリッジ ID が最も小さいスイッチ",
+        "ポート数が最も多いスイッチ",
+        "最初に起動したスイッチ"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "ルートブリッジはブリッジ ID（ブリッジプライオリティ＋MAC アドレス）の比較で決まり、最も小さいものが選ばれる。プライオリティが同点なら MAC アドレスの小さい方。意図したスイッチをルートにするにはプライオリティを下げる設定を行う。",
+      "id": "q209",
+      "stem": "Rapid PVST+ でルートブリッジに選ばれるのはどのようなスイッチか。",
+      "subtopic": "2.5 Rapid PVST+（ルートブリッジ選出）",
+      "type": "single"
+    },
+    {
+      "answer": [
+        0,
+        1
+      ],
+      "choices": [
+        "PortFast はエッジポートを即座にフォワーディング状態へ遷移させる",
+        "BPDU ガードは、PortFast 有効ポートが BPDU を受信するとそのポートを err-disable 状態にする",
+        "PortFast はスイッチ間リンクに設定することが推奨される",
+        "BPDU ガードは、受信した BPDU を破棄して通信を継続させる"
+      ],
+      "domain": "switching",
+      "examVersion": "v2.0",
+      "explanation": "PortFast は端末向けのエッジポートで、STP の待機を省いて即座に転送状態にする機能。スイッチ間リンクに使うものではない。BPDU ガードは、そのポートにスイッチが誤接続されて BPDU が届いた場合に、ループを防ぐためポートを err-disable（無効化）する。BPDU を破棄して継続するのではない。",
+      "id": "q210",
+      "stem": "PortFast と BPDU ガードについて、正しいものを2つ選べ。",
+      "subtopic": "2.5 PortFast と BPDU ガード",
+      "type": "multi"
+    },
+    {
+      "answer": [
         2
       ],
       "choices": [
