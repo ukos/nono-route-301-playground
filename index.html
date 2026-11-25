@@ -62,13 +62,15 @@
     <div style="margin-top:40px;">
       <button class="btn primary" id="btn-start">▶ はじめる</button>
     </div>
-    <p class="ver">ver. 0.5（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+    <p class="ver">ver. 0.6（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
   </section>
 
   <!-- メニュー選択 -->
   <section id="scr-menu" class="screen">
     <div class="head"><button class="back" data-go="scr-title">← 戻る</button><h2>メニュー</h2></div>
     <button class="btn" id="btn-exam">試験対策編<span class="cnt" id="cnt-exam"></span></button>
+    <button class="btn" id="btn-mock">模擬試験<span class="cnt" id="cnt-mock"></span></button>
+    <button class="btn" id="btn-review">間違えた問題の復習<span class="cnt" id="cnt-review"></span></button>
     <button class="btn" id="btn-field">現場実践編<span class="cnt" id="cnt-field"></span></button>
     <p class="note">現場実践編は、症状と観測情報から原因を特定するケース問題です。学習記録（分野ベスト・解決済みケース）はこの端末に保存されます。</p>
     <button class="btn" id="btn-reset">学習記録をリセット<span class="cnt">ベスト・解決済みを消去</span></button>
@@ -83,7 +85,7 @@
 
   <!-- 出題画面 -->
   <section id="scr-quiz" class="screen">
-    <div class="head"><button class="back" data-go="scr-domains">← やめる</button><h2 id="quiz-head">問題</h2></div>
+    <div class="head"><button class="back" id="quiz-back" data-go="scr-domains">← やめる</button><h2 id="quiz-head">問題</h2></div>
     <div class="meta" id="quiz-meta"></div>
     <div class="stem" id="quiz-stem"></div>
     <div id="quiz-choices"></div>
@@ -136,6 +138,13 @@ let DATA = null, quiz = null;
 function show(id){
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
   window.scrollTo(0,0);
+  if (id === "scr-menu" && DATA) refreshMenu();
+}
+function refreshMenu(){
+  const n = (PROG.wrong || []).length;
+  $("cnt-review").textContent = n ? n + "問" : "なし";
+  $("btn-review").disabled = n === 0;
+  $("cnt-mock").textContent = "20問" + (PROG.mockBest ? "・ベスト" + PROG.mockBest : "");
 }
 document.querySelectorAll("[data-go]").forEach(b =>
   b.addEventListener("click", () => show(b.dataset.go)));
@@ -147,6 +156,9 @@ async function load(){
   $("cnt-exam").textContent = "全" + DATA.questions.length + "問";
   buildDomains();
   $("btn-exam").addEventListener("click", () => show("scr-domains"));
+  $("btn-mock").addEventListener("click", startMock);
+  $("btn-review").addEventListener("click", startReview);
+  refreshMenu();
   loadCases();
 }
 function buildDomains(){
@@ -163,15 +175,44 @@ function buildDomains(){
     list.appendChild(b);
   });
 }
+function shuffle(a){
+  a = [...a];
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 function startQuiz(domainId){
   const qs = DATA.questions.filter(q => q.domain === domainId);
-  quiz = { list: qs, idx: 0, score: 0, picked: new Set(), locked: false, domain: domainId };
+  quiz = { list: qs, idx: 0, score: 0, picked: new Set(), locked: false,
+    domain: domainId, mode: "domain", title: null, per: {} };
+  $("quiz-back").dataset.go = "scr-domains";
+  renderQ(); show("scr-quiz");
+}
+function startMock(){
+  const weights = { "infra": 5, "switching": 5, "routing": 4, "services-security": 4, "ai-ops": 2 };
+  let list = [];
+  for (const d of Object.keys(weights)){
+    list = list.concat(shuffle(DATA.questions.filter(q => q.domain === d)).slice(0, weights[d]));
+  }
+  quiz = { list: shuffle(list), idx: 0, score: 0, picked: new Set(), locked: false,
+    domain: null, mode: "mock", title: "模擬試験", per: {} };
+  $("quiz-back").dataset.go = "scr-menu";
+  renderQ(); show("scr-quiz");
+}
+function startReview(){
+  const list = (PROG.wrong || []).map(id => DATA.questions.find(q => q.id === id)).filter(Boolean);
+  if (!list.length) return;
+  quiz = { list, idx: 0, score: 0, picked: new Set(), locked: false,
+    domain: null, mode: "review", title: "復習", per: {} };
+  $("quiz-back").dataset.go = "scr-menu";
   renderQ(); show("scr-quiz");
 }
 function renderQ(){
   const q = quiz.list[quiz.idx];
   quiz.picked = new Set(); quiz.locked = false;
-  $("quiz-head").textContent = "問題 " + (quiz.idx + 1) + " / " + quiz.list.length;
+  $("quiz-head").textContent = (quiz.title ? quiz.title + " " : "問題 ") + (quiz.idx + 1) + " / " + quiz.list.length;
   $("quiz-meta").textContent = q.subtopic + (q.type === "multi" ? "（複数回答）" : "（単一回答）");
   $("quiz-stem").textContent = q.stem;
   const box = $("quiz-choices"); box.innerHTML = "";
@@ -196,6 +237,13 @@ $("btn-answer").addEventListener("click", () => {
   quiz.locked = true;
   const ok = quiz.picked.size === q.answer.length && q.answer.every(a => quiz.picked.has(a));
   if (ok) quiz.score++;
+  PROG.wrong = PROG.wrong || [];
+  const wi = PROG.wrong.indexOf(q.id);
+  if (ok && wi >= 0) PROG.wrong.splice(wi, 1);
+  if (!ok && wi < 0) PROG.wrong.push(q.id);
+  saveProg();
+  const pd = quiz.per[q.domain] = quiz.per[q.domain] || { ok: 0, total: 0 };
+  pd.total++; if (ok) pd.ok++;
   [...$("quiz-choices").children].forEach((el, j) => {
     if (q.answer.includes(j)) el.classList.add("correct");
     else if (quiz.picked.has(j)) el.classList.add("wrong");
@@ -211,17 +259,32 @@ $("btn-answer").addEventListener("click", () => {
 $("btn-next").addEventListener("click", () => {
   if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
   else {
-    const prev = PROG.best[quiz.domain] || 0;
     $("result-score").textContent = quiz.score + " / " + quiz.list.length + " 問正解";
-    $("result-note").textContent = quiz.score === quiz.list.length ? "全問正解です。" :
-      (quiz.score > prev ? "この分野のベストを更新しました。" : "間違えた問題は解説を読み直してみてください。");
-    if (quiz.score > prev){ PROG.best[quiz.domain] = quiz.score; saveProg(); buildDomains(); }
+    if (quiz.mode === "mock"){
+      const prevM = PROG.mockBest || 0;
+      const bd = DATA.domains.map(d => {
+        const p = quiz.per[d.id];
+        return p ? DOMAIN_TAG[d.id] + " " + p.ok + "/" + p.total : null;
+      }).filter(Boolean).join("、");
+      $("result-note").textContent = "分野別：" + bd +
+        (quiz.score > prevM && prevM > 0 ? "（模擬試験のベストを更新しました）" : "");
+      if (quiz.score > prevM){ PROG.mockBest = quiz.score; saveProg(); }
+    } else if (quiz.mode === "review"){
+      const left = (PROG.wrong || []).length;
+      $("result-note").textContent = left === 0 ? "復習リストが空になりました。" :
+        "残りの復習は " + left + " 問です。";
+    } else {
+      const prev = PROG.best[quiz.domain] || 0;
+      $("result-note").textContent = quiz.score === quiz.list.length ? "全問正解です。" :
+        (quiz.score > prev ? "この分野のベストを更新しました。" : "間違えた問題は解説を読み直してみてください。");
+      if (quiz.score > prev){ PROG.best[quiz.domain] = quiz.score; saveProg(); buildDomains(); }
+    }
     show("scr-result");
   }
 });
 
 /* ===== 学習記録（localStorage） ===== */
-let PROG = { solved: [], best: {} };
+let PROG = { solved: [], best: {}, wrong: [], mockBest: 0 };
 try {
   const raw = localStorage.getItem("route301-progress-v1");
   if (raw) PROG = Object.assign(PROG, JSON.parse(raw));
@@ -232,7 +295,7 @@ function saveProg(){
 }
 $("btn-reset").addEventListener("click", () => {
   if (!confirm("学習記録（分野ベストと解決済みケース）を消去しますか？")) return;
-  PROG = { solved: [], best: {} };
+  PROG = { solved: [], best: {}, wrong: [], mockBest: 0 };
   solvedCases.clear();
   try { localStorage.removeItem("route301-progress-v1"); } catch(e) {}
   buildDomains();
