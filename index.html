@@ -62,7 +62,7 @@
     <div style="margin-top:40px;">
       <button class="btn primary" id="btn-start">▶ はじめる</button>
     </div>
-    <p class="ver">ver. 0.6（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+    <p class="ver">ver. 0.7（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
   </section>
 
   <!-- メニュー選択 -->
@@ -211,31 +211,49 @@ function startReview(){
 }
 function renderQ(){
   const q = quiz.list[quiz.idx];
-  quiz.picked = new Set(); quiz.locked = false;
+  quiz.picked = new Set(); quiz.locked = false; quiz.seq = []; quiz.tiles = null;
   $("quiz-head").textContent = (quiz.title ? quiz.title + " " : "問題 ") + (quiz.idx + 1) + " / " + quiz.list.length;
-  $("quiz-meta").textContent = q.subtopic + (q.type === "multi" ? "（複数回答）" : "（単一回答）");
+  $("quiz-meta").textContent = q.subtopic +
+    (q.type === "multi" ? "（複数回答）" : q.type === "order" ? "（並べ替え：正しい順にタップ）" : "（単一回答）");
   $("quiz-stem").textContent = q.stem;
   const box = $("quiz-choices"); box.innerHTML = "";
-  q.choices.forEach((c, i) => {
-    const b = document.createElement("button");
-    b.className = "btn choice"; b.textContent = "ABCD"[i] + ". " + c;
-    b.addEventListener("click", () => {
-      if (quiz.locked) return;
-      if (q.type === "single"){ quiz.picked = new Set([i]); }
-      else { quiz.picked.has(i) ? quiz.picked.delete(i) : quiz.picked.add(i); }
-      [...box.children].forEach((el, j) => el.classList.toggle("sel", quiz.picked.has(j)));
+  if (q.type === "order"){
+    quiz.tiles = shuffle(q.items.map((_, i) => i));
+    quiz.tiles.forEach(itemIdx => {
+      const b = document.createElement("button");
+      b.className = "btn choice"; b.dataset.item = itemIdx;
+      b.textContent = q.items[itemIdx];
+      b.addEventListener("click", () => {
+        if (quiz.locked) return;
+        const pos = quiz.seq.indexOf(itemIdx);
+        if (pos >= 0) quiz.seq.splice(pos, 1); else quiz.seq.push(itemIdx);
+        [...box.children].forEach(el => {
+          const ii = Number(el.dataset.item);
+          const p = quiz.seq.indexOf(ii);
+          el.classList.toggle("sel", p >= 0);
+          el.textContent = (p >= 0 ? (p + 1) + ". " : "") + q.items[ii];
+        });
+      });
+      box.appendChild(b);
     });
-    box.appendChild(b);
-  });
+  } else {
+    q.choices.forEach((c, i) => {
+      const b = document.createElement("button");
+      b.className = "btn choice"; b.textContent = "ABCD"[i] + ". " + c;
+      b.addEventListener("click", () => {
+        if (quiz.locked) return;
+        if (q.type === "single"){ quiz.picked = new Set([i]); }
+        else { quiz.picked.has(i) ? quiz.picked.delete(i) : quiz.picked.add(i); }
+        [...box.children].forEach((el, j) => el.classList.toggle("sel", quiz.picked.has(j)));
+      });
+      box.appendChild(b);
+    });
+  }
   $("btn-answer").style.display = "";
   $("quiz-expl").className = "expl";
   $("btn-next").style.display = "none";
 }
-$("btn-answer").addEventListener("click", () => {
-  const q = quiz.list[quiz.idx];
-  if (quiz.locked || quiz.picked.size === 0) return;
-  quiz.locked = true;
-  const ok = quiz.picked.size === q.answer.length && q.answer.every(a => quiz.picked.has(a));
+function applyResult(q, ok, judgeText, markFn){
   if (ok) quiz.score++;
   PROG.wrong = PROG.wrong || [];
   const wi = PROG.wrong.indexOf(q.id);
@@ -244,17 +262,39 @@ $("btn-answer").addEventListener("click", () => {
   saveProg();
   const pd = quiz.per[q.domain] = quiz.per[q.domain] || { ok: 0, total: 0 };
   pd.total++; if (ok) pd.ok++;
-  [...$("quiz-choices").children].forEach((el, j) => {
-    if (q.answer.includes(j)) el.classList.add("correct");
-    else if (quiz.picked.has(j)) el.classList.add("wrong");
-  });
-  $("quiz-judge").textContent = ok ? "正解" : "不正解（正解：" + q.answer.map(a => "ABCD"[a]).join("・") + "）";
+  markFn();
+  $("quiz-judge").textContent = judgeText;
   $("quiz-judge").className = "judge " + (ok ? "ok" : "ng");
   $("quiz-expl-text").textContent = q.explanation;
   $("quiz-expl").classList.add("show");
   $("btn-answer").style.display = "none";
   $("btn-next").textContent = quiz.idx + 1 < quiz.list.length ? "次へ →" : "結果を見る →";
   $("btn-next").style.display = "";
+}
+$("btn-answer").addEventListener("click", () => {
+  const q = quiz.list[quiz.idx];
+  if (quiz.locked) return;
+  if (q.type === "order"){
+    if (quiz.seq.length !== q.items.length) return;
+    quiz.locked = true;
+    const ok = quiz.seq.every((v, pos) => v === pos);
+    applyResult(q, ok, ok ? "正解" : "不正解", () => {
+      [...$("quiz-choices").children].forEach(el => {
+        const itemIdx = Number(el.dataset.item);
+        el.classList.add(quiz.seq.indexOf(itemIdx) === itemIdx ? "correct" : "wrong");
+      });
+    });
+    return;
+  }
+  if (quiz.picked.size === 0) return;
+  quiz.locked = true;
+  const ok = quiz.picked.size === q.answer.length && q.answer.every(a => quiz.picked.has(a));
+  applyResult(q, ok, ok ? "正解" : "不正解（正解：" + q.answer.map(a => "ABCD"[a]).join("・") + "）", () => {
+    [...$("quiz-choices").children].forEach((el, j) => {
+      if (q.answer.includes(j)) el.classList.add("correct");
+      else if (quiz.picked.has(j)) el.classList.add("wrong");
+    });
+  });
 });
 $("btn-next").addEventListener("click", () => {
   if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
