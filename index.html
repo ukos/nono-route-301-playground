@@ -52,6 +52,18 @@
   .evcard pre{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;
     line-height:1.65; white-space:pre-wrap; word-break:break-all;}
   .done{color:var(--good); font-weight:700;}
+  .figbox{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:8px;}
+  .figbox svg{display:block; width:100%; height:auto;}
+  .fillbox{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:15px; line-height:2.1; margin-bottom:8px;}
+  .fillbox .blank{display:inline-block; min-width:56px; text-align:center; border-bottom:2px solid var(--accent); color:var(--accent); font-weight:700; padding:0 6px;}
+  .cmdline{background:#0d1526; border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13.5px; line-height:1.8; margin-bottom:8px; word-break:break-all;}
+  .cmdline .prompt{color:var(--good);}
+  .timer{color:var(--accent); font-weight:700; font-size:14px; text-align:right; margin-bottom:6px; min-height:18px;}
+  .timer.low{color:var(--bad);}
+  .revitem{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:13.5px; line-height:1.7; text-align:left;}
+  .revitem .rj{font-weight:700;}
+  .revitem .rj.ok{color:var(--good);} .revitem .rj.ng{color:var(--bad);}
+  .revitem .rans{color:var(--muted);}
 </style>
 </head>
 <body>
@@ -63,17 +75,18 @@
     <div style="margin-top:40px;">
       <button class="btn primary" id="btn-start">▶ はじめる</button>
     </div>
-    <p class="ver">ver. 0.9.1（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
+    <p class="ver">ver. 1.0（試作）／ 試験範囲 v2.0（2027-02-03開始）</p>
   </section>
 
   <!-- メニュー選択 -->
   <section id="scr-menu" class="screen">
     <div class="head"><button class="back" data-go="scr-title">← 戻る</button><h2>メニュー</h2></div>
     <button class="btn" id="btn-exam">試験対策編<span class="cnt" id="cnt-exam"></span></button>
-    <button class="btn" id="btn-mock">模擬試験<span class="cnt" id="cnt-mock"></span></button>
+    <button class="btn" id="btn-mock">模擬試験（本番形式）<span class="cnt" id="cnt-mock"></span></button>
     <button class="btn" id="btn-review">間違えた問題の復習<span class="cnt" id="cnt-review"></span></button>
     <button class="btn" id="btn-field">現場実践編<span class="cnt" id="cnt-field"></span></button>
-    <p class="note">現場実践編は、症状と観測情報から原因を特定するケース問題です。学習記録（分野ベスト・解決済みケース）はこの端末に保存されます。</p>
+    <p class="note">模擬試験は本番形式です（20問・制限時間24分、正誤と解説は最後にまとめて表示）。現場実践編は、症状と観測情報から原因を特定するケース問題です。学習記録（分野ベスト・正答率・解決済みケース）はこの端末に保存されます。</p>
+    <p class="note" id="menu-stats"></p>
     <button class="btn" id="btn-reset">学習記録をリセット<span class="cnt">ベスト・解決済みを消去</span></button>
   </section>
 
@@ -88,7 +101,9 @@
   <section id="scr-quiz" class="screen">
     <div class="head"><button class="back" id="quiz-back" data-go="scr-domains">← やめる</button><h2 id="quiz-head">問題</h2></div>
     <div class="meta" id="quiz-meta"></div>
+    <div class="timer" id="quiz-timer"></div>
     <div class="stem" id="quiz-stem"></div>
+    <div id="quiz-fig"></div>
     <div id="quiz-choices"></div>
     <button class="btn primary" id="btn-answer">回答する</button>
     <div class="expl" id="quiz-expl">
@@ -126,6 +141,7 @@
     <div class="head"><h2>結果</h2></div>
     <p class="score" id="result-score"></p>
     <p class="note" id="result-note" style="text-align:center;"></p>
+    <div id="result-review"></div>
     <button class="btn" data-go="scr-domains">分野選択へ戻る</button>
     <button class="btn" data-go="scr-menu">メニューへ戻る</button>
   </section>
@@ -137,6 +153,7 @@ const $ = id => document.getElementById(id);
 let DATA = null, quiz = null;
 
 function show(id){
+  if (id !== "scr-quiz") stopTimer();
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
   window.scrollTo(0,0);
   if (id === "scr-menu" && DATA) refreshMenu();
@@ -145,7 +162,10 @@ function refreshMenu(){
   const n = (PROG.wrong || []).length;
   $("cnt-review").textContent = n ? n + "問" : "なし";
   $("btn-review").disabled = n === 0;
-  $("cnt-mock").textContent = "20問" + (PROG.mockBest ? "・ベスト" + PROG.mockBest : "");
+  $("cnt-mock").textContent = "20問・24分" + (PROG.mockBest ? "・ベスト" + PROG.mockBest : "");
+  const st = PROG.stats || {}; let T = 0, C = 0;
+  for (const k of Object.keys(st)){ T += st[k].t; C += st[k].c; }
+  $("menu-stats").textContent = T ? "通算の正答率：" + Math.round(C / T * 100) + "%（" + C + " / " + T + " 問）" : "";
 }
 document.querySelectorAll("[data-go]").forEach(b =>
   b.addEventListener("click", () => show(b.dataset.go)));
@@ -171,7 +191,9 @@ function buildDomains(){
     b.innerHTML = "";
     b.appendChild(document.createTextNode(d.name + "（" + d.weight + "%）"));
     const c = document.createElement("span"); c.className = "cnt";
-    c.textContent = n ? n + "問" + (PROG.best[d.id] ? "・ベスト" + PROG.best[d.id] : "") : "準備中"; b.appendChild(c);
+    const st = (PROG.stats || {})[d.id];
+    c.textContent = n ? n + "問" + (PROG.best[d.id] ? "・ベスト" + PROG.best[d.id] : "") +
+      (st && st.t ? "・正答率" + Math.round(st.c / st.t * 100) + "%" : "") : "準備中"; b.appendChild(c);
     b.addEventListener("click", () => startQuiz(d.id));
     list.appendChild(b);
   });
@@ -198,9 +220,10 @@ function startMock(){
     list = list.concat(shuffle(DATA.questions.filter(q => q.domain === d)).slice(0, weights[d]));
   }
   quiz = { list: shuffle(list), idx: 0, score: 0, picked: new Set(), locked: false,
-    domain: null, mode: "mock", title: "模擬試験", per: {} };
+    domain: null, mode: "mock", title: "模擬試験", per: {},
+    exam: true, records: [], deadline: Date.now() + 24 * 60 * 1000 };
   $("quiz-back").dataset.go = "scr-menu";
-  renderQ(); show("scr-quiz");
+  renderQ(); show("scr-quiz"); startTimer();
 }
 function startReview(){
   const list = (PROG.wrong || []).map(id => DATA.questions.find(q => q.id === id)).filter(Boolean);
@@ -214,11 +237,41 @@ function renderQ(){
   const q = quiz.list[quiz.idx];
   quiz.picked = new Set(); quiz.locked = false; quiz.seq = []; quiz.tiles = null;
   $("quiz-head").textContent = (quiz.title ? quiz.title + " " : "問題 ") + (quiz.idx + 1) + " / " + quiz.list.length;
-  $("quiz-meta").textContent = q.subtopic +
-    (q.type === "multi" ? "（複数回答）" : q.type === "order" ? "（並べ替え：正しい順にタップ）" : "（単一回答）");
+  const TYPE_LABEL = { single: "（単一回答）", multi: "（複数回答）",
+    order: "（並べ替え：正しい順にタップ）", fill: "（穴埋め：タイルを順にタップ）",
+    lab: "（ラボ：コマンドを組み立て）" };
+  $("quiz-meta").textContent = q.subtopic + (TYPE_LABEL[q.type] || "（単一回答）");
+  if (!quiz.exam) $("quiz-timer").textContent = "";
   $("quiz-stem").textContent = q.stem;
+  const fig = $("quiz-fig");
+  if (q.figure){ fig.className = "figbox"; fig.innerHTML = q.figure; }
+  else { fig.className = ""; fig.innerHTML = ""; }
   const box = $("quiz-choices"); box.innerHTML = "";
-  if (q.type === "order"){
+  if (q.type === "fill" || q.type === "lab"){
+    if (q.type === "lab"){
+      const pre = document.createElement("div"); pre.className = "evcard";
+      const lab = document.createElement("div"); lab.className = "evlabel"; lab.textContent = "状況";
+      const pr = document.createElement("pre"); pr.textContent = q.pre;
+      pre.appendChild(lab); pre.appendChild(pr); box.appendChild(pre);
+      const cmd = document.createElement("div"); cmd.className = "cmdline"; cmd.id = "asm-display"; box.appendChild(cmd);
+    } else {
+      const fb = document.createElement("div"); fb.className = "fillbox"; fb.id = "asm-display"; box.appendChild(fb);
+    }
+    quiz.tiles = shuffle(q.tiles.map((_, i) => i));
+    quiz.tiles.forEach(tileIdx => {
+      const b = document.createElement("button");
+      b.className = "btn choice"; b.dataset.item = tileIdx;
+      b.textContent = q.tiles[tileIdx];
+      b.addEventListener("click", () => {
+        if (quiz.locked) return;
+        const pos = quiz.seq.indexOf(tileIdx);
+        if (pos >= 0) quiz.seq.splice(pos, 1); else quiz.seq.push(tileIdx);
+        updateAsm();
+      });
+      box.appendChild(b);
+    });
+    updateAsm();
+  } else if (q.type === "order"){
     quiz.tiles = shuffle(q.items.map((_, i) => i));
     quiz.tiles.forEach(itemIdx => {
       const b = document.createElement("button");
@@ -254,15 +307,95 @@ function renderQ(){
   $("quiz-expl").className = "expl";
   $("btn-next").style.display = "none";
 }
-function applyResult(q, ok, judgeText, markFn){
+function updateAsm(){
+  const q = quiz.list[quiz.idx];
+  const disp = $("asm-display");
+  if (!disp) return;
+  if (q.type === "lab"){
+    disp.innerHTML = "";
+    const p = document.createElement("span"); p.className = "prompt";
+    p.textContent = q.prompt + " "; disp.appendChild(p);
+    disp.appendChild(document.createTextNode(quiz.seq.map(i => q.tiles[i]).join(" ")));
+  } else {
+    disp.innerHTML = "";
+    let bi = 0;
+    q.segments.forEach(seg => {
+      if (seg === null){
+        const sp = document.createElement("span"); sp.className = "blank";
+        sp.textContent = bi < quiz.seq.length ? q.tiles[quiz.seq[bi]] : "＿＿";
+        bi++; disp.appendChild(sp);
+      } else disp.appendChild(document.createTextNode(seg));
+    });
+  }
+  [...$("quiz-choices").querySelectorAll("[data-item]")].forEach(el => {
+    el.classList.toggle("sel", quiz.seq.includes(Number(el.dataset.item)));
+  });
+}
+function recordAnswer(q, ok){
   if (ok) quiz.score++;
   PROG.wrong = PROG.wrong || [];
   const wi = PROG.wrong.indexOf(q.id);
   if (ok && wi >= 0) PROG.wrong.splice(wi, 1);
   if (!ok && wi < 0) PROG.wrong.push(q.id);
+  if (quiz.mode === "domain" || quiz.mode === "mock"){
+    PROG.stats = PROG.stats || {};
+    const s = PROG.stats[q.domain] = PROG.stats[q.domain] || { t: 0, c: 0 };
+    s.t++; if (ok) s.c++;
+  }
   saveProg();
   const pd = quiz.per[q.domain] = quiz.per[q.domain] || { ok: 0, total: 0 };
   pd.total++; if (ok) pd.ok++;
+}
+function correctDesc(q){
+  if (q.type === "order") return q.items.join(" → ");
+  if (q.type === "fill" || q.type === "lab") return q.answer.map(a => q.tiles[a]).join(" ");
+  return q.answer.map(a => "ABCD"[a] + ". " + q.choices[a]).join("、");
+}
+function chosenDesc(q){
+  if (q.type === "order") return quiz.seq.length ? quiz.seq.map(i => q.items[i]).join(" → ") : "（未回答）";
+  if (q.type === "fill" || q.type === "lab") return quiz.seq.length ? quiz.seq.map(i => q.tiles[i]).join(" ") : "（未回答）";
+  return quiz.picked.size ? [...quiz.picked].sort((a, b) => a - b).map(i => "ABCD"[i] + ". " + q.choices[i]).join("、") : "（未回答）";
+}
+function examRecord(q, ok){
+  recordAnswer(q, ok);
+  quiz.records.push({ q, ok, chosen: chosenDesc(q) });
+  if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
+  else finishQuiz();
+}
+let timerId = null;
+function fmtTime(ms){
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+function startTimer(){
+  stopTimer();
+  const tick = () => {
+    if (!quiz || !quiz.exam) return;
+    const left = quiz.deadline - Date.now();
+    const el = $("quiz-timer");
+    el.textContent = "残り時間 " + fmtTime(left);
+    el.classList.toggle("low", left < 60000);
+    if (left <= 0){ stopTimer(); finishExamTimeout(); }
+  };
+  tick();
+  timerId = setInterval(tick, 500);
+}
+function stopTimer(){ if (timerId){ clearInterval(timerId); timerId = null; } }
+function finishExamTimeout(){
+  if (!quiz || !quiz.exam) return;
+  if (quiz.records.length === quiz.idx){
+    const q = quiz.list[quiz.idx];
+    recordAnswer(q, false);
+    quiz.records.push({ q, ok: false, chosen: "（時間切れ・未回答）" });
+  }
+  for (let i = quiz.idx + 1; i < quiz.list.length; i++){
+    recordAnswer(quiz.list[i], false);
+    quiz.records.push({ q: quiz.list[i], ok: false, chosen: "（時間切れ・未回答）" });
+  }
+  finishQuiz();
+}
+function applyResult(q, ok, judgeText, markFn){
+  recordAnswer(q, ok);
   markFn();
   $("quiz-judge").textContent = judgeText;
   $("quiz-judge").className = "judge " + (ok ? "ok" : "ng");
@@ -275,6 +408,26 @@ function applyResult(q, ok, judgeText, markFn){
 $("btn-answer").addEventListener("click", () => {
   const q = quiz.list[quiz.idx];
   if (quiz.locked) return;
+  if (quiz.exam){
+    let ok = false;
+    if (q.type === "order") ok = quiz.seq.length === q.items.length && quiz.seq.every((v, pos) => v === pos);
+    else if (q.type === "fill" || q.type === "lab") ok = quiz.seq.length === q.answer.length && quiz.seq.every((v, pos) => v === q.answer[pos]);
+    else ok = quiz.picked.size === q.answer.length && q.answer.every(a => quiz.picked.has(a));
+    quiz.locked = true;
+    examRecord(q, ok);
+    return;
+  }
+  if (q.type === "fill" || q.type === "lab"){
+    if (quiz.seq.length !== q.answer.length) return;
+    quiz.locked = true;
+    const ok = quiz.seq.every((v, pos) => v === q.answer[pos]);
+    applyResult(q, ok, ok ? "正解" : "不正解（正解：" + correctDesc(q) + "）", () => {
+      [...$("quiz-choices").querySelectorAll("[data-item]")].forEach(el => {
+        el.classList.add(q.answer.includes(Number(el.dataset.item)) ? "correct" : "wrong");
+      });
+    });
+    return;
+  }
   if (q.type === "order"){
     if (quiz.seq.length !== q.items.length) return;
     quiz.locked = true;
@@ -299,17 +452,34 @@ $("btn-answer").addEventListener("click", () => {
 });
 $("btn-next").addEventListener("click", () => {
   if (quiz.idx + 1 < quiz.list.length){ quiz.idx++; renderQ(); }
-  else {
+  else finishQuiz();
+});
+function finishQuiz(){
+    stopTimer();
+    $("quiz-timer").textContent = "";
     $("result-score").textContent = quiz.score + " / " + quiz.list.length + " 問正解";
+    const rev = $("result-review"); rev.innerHTML = "";
     if (quiz.mode === "mock"){
       const prevM = PROG.mockBest || 0;
       const bd = DATA.domains.map(d => {
         const p = quiz.per[d.id];
         return p ? DOMAIN_TAG[d.id] + " " + p.ok + "/" + p.total : null;
       }).filter(Boolean).join("、");
-      $("result-note").textContent = "分野別：" + bd +
+      const pct = Math.round(quiz.score / quiz.list.length * 100);
+      $("result-note").textContent = "分野別：" + bd + "／正答率 " + pct + "%" +
+        (pct >= 80 ? "（合格圏内の目安です）" : "（合格の目安は正答率80%）") +
         (quiz.score > prevM && prevM > 0 ? "（模擬試験のベストを更新しました）" : "");
       if (quiz.score > prevM){ PROG.mockBest = quiz.score; saveProg(); }
+      (quiz.records || []).forEach((r, i) => {
+        const d = document.createElement("div"); d.className = "revitem";
+        const j = document.createElement("div"); j.className = "rj " + (r.ok ? "ok" : "ng");
+        j.textContent = (r.ok ? "○" : "×") + " 問" + (i + 1) + "：" + r.q.subtopic; d.appendChild(j);
+        const st = document.createElement("div"); st.textContent = r.q.stem; d.appendChild(st);
+        const a = document.createElement("div"); a.className = "rans";
+        a.textContent = "あなたの回答：" + r.chosen + "／正解：" + correctDesc(r.q); d.appendChild(a);
+        const e = document.createElement("div"); e.textContent = r.q.explanation; d.appendChild(e);
+        rev.appendChild(d);
+      });
     } else if (quiz.mode === "review"){
       const left = (PROG.wrong || []).length;
       $("result-note").textContent = left === 0 ? "復習リストが空になりました。" :
@@ -321,11 +491,10 @@ $("btn-next").addEventListener("click", () => {
       if (quiz.score > prev){ PROG.best[quiz.domain] = quiz.score; saveProg(); buildDomains(); }
     }
     show("scr-result");
-  }
-});
+}
 
 /* ===== 学習記録（localStorage） ===== */
-let PROG = { solved: [], best: {}, wrong: [], mockBest: 0 };
+let PROG = { solved: [], best: {}, wrong: [], mockBest: 0, stats: {} };
 try {
   const raw = localStorage.getItem("route301-progress-v1");
   if (raw) PROG = Object.assign(PROG, JSON.parse(raw));
@@ -336,7 +505,7 @@ function saveProg(){
 }
 $("btn-reset").addEventListener("click", () => {
   if (!confirm("学習記録（分野ベストと解決済みケース）を消去しますか？")) return;
-  PROG = { solved: [], best: {}, wrong: [], mockBest: 0 };
+  PROG = { solved: [], best: {}, wrong: [], mockBest: 0, stats: {} };
   solvedCases.clear();
   try { localStorage.removeItem("route301-progress-v1"); } catch(e) {}
   buildDomains();

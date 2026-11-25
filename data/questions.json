@@ -1,1949 +1,3651 @@
 {
-  "domains": [
-    {
-      "id": "infra",
-      "name": "1.0 Network Infrastructure and Connectivity",
-      "weight": 25
-    },
-    {
-      "id": "switching",
-      "name": "2.0 Switching and Network Access",
-      "weight": 25
-    },
-    {
-      "id": "routing",
-      "name": "3.0 IP Routing",
-      "weight": 20
-    },
-    {
-      "id": "services-security",
-      "name": "4.0 Network Services and Security",
-      "weight": 20
-    },
-    {
-      "id": "ai-ops",
-      "name": "5.0 AI, and Network Operations and Management",
-      "weight": 10
-    }
-  ],
-  "examVersion": "v2.0",
-  "questions": [
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "ケーブルの断線",
-        "duplex（デュプレックス）のミスマッチ",
-        "IP アドレスの重複",
-        "STP のループ"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "片側が全二重、片側が半二重で動作すると、半二重側では遅延コリジョン（late collision）、全二重側では FCS／CRC エラーが増え、通信できても極端に遅くなる。show interfaces のカウンタと両端の duplex 設定を突き合わせるのが切り分けの基本。",
-      "id": "q101",
-      "stem": "スイッチとルータを接続したリンクで、通信はできるが極端に遅い。半二重で動作している側では late collision（遅延コリジョン）が、全二重側では FCS エラーが増加している。最も可能性が高い原因はどれか。",
-      "subtopic": "1.1 インターフェース／ケーブル障害の診断",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "マルチモードファイバ",
-        "シングルモードファイバ",
-        "カテゴリ5e UTP ケーブル",
-        "同軸ケーブル"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "シングルモードファイバはコア径が細く、長距離伝送に向く（数km〜）。マルチモードは構内などの短距離向け、UTP は 100m が上限。距離と信号減衰の観点から媒体を選ぶのが 1.1 の要点。",
-      "id": "q102",
-      "stem": "1.5km 離れた2つの建物の間を光ファイバで接続する。最も適した媒体はどれか。",
-      "subtopic": "1.1 ケーブル種別と距離",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "タイプ1（ベアメタル型）",
-        "タイプ2（ホスト型）",
-        "コンテナランタイム",
-        "ターミナルエミュレータ"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "タイプ1ハイパーバイザはハードウェア上で直接動作し、間にホスト OS を挟まないため、サーバ仮想化の基盤として使われる。タイプ2は既存の OS 上でアプリケーションとして動作する。",
-      "id": "q103",
-      "stem": "ハイパーバイザのうち、ホスト OS を介さずハードウェア上で直接動作するものはどれか。",
-      "subtopic": "1.2 ハイパーバイザの種類",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "各コンテナが専用のゲスト OS とカーネルを持つ",
-        "ホスト OS のカーネルを共有し、ゲスト OS を持たないため軽量で起動が速い",
-        "動作には必ずハイパーバイザが必要である",
-        "仮想マシンより消費リソースが大きい"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "コンテナはホスト OS のカーネルを共有し、プロセスとして隔離される。そのためゲスト OS 分のオーバーヘッドがなく、軽量で起動も速い。仮想マシンは台ごとにゲスト OS を持ち、より強い隔離が得られる。",
-      "id": "q104",
-      "stem": "仮想マシンと比較したコンテナの特徴として正しいものはどれか。",
-      "subtopic": "1.2 コンテナと仮想マシン",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "192.168.1.0",
-        "192.168.1.64",
-        "192.168.1.70",
-        "192.168.1.128"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "/26 のブロックサイズは 64。ネットワークは .0、.64、.128、.192 と区切られるため、.70 が属するネットワークは .64。ブロードキャストは .127、使用可能範囲は .65〜.126。",
-      "id": "q105",
-      "stem": "ホスト 192.168.1.70/26 が属するネットワークアドレスはどれか。",
-      "subtopic": "1.3 IPv4 サブネット計算",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "DNS サーバに到達できないため",
-        "デフォルトゲートウェイが自サブネットの範囲外にあるため",
-        "DHCP サーバが停止しているため",
-        "ケーブルがクロス結線になっているため"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "/25 では 192.168.1.128/25 の使用可能範囲は .129〜.254。ゲートウェイの 192.168.1.1 は反対側のサブネット（.0/25）に属するため、PC はゲートウェイ自体に到達できない。ゲートウェイは必ず自サブネット内に置く。",
-      "id": "q106",
-      "stem": "PC に 192.168.1.130/25 を設定し、デフォルトゲートウェイを 192.168.1.1 としたが、他のネットワークへ通信できない。原因はどれか。",
-      "subtopic": "1.3 IPv4 設定のトラブルシュート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "2001:db8::ff00:42:8329",
-        "2001:db8::ff00::42:8329",
-        "2001:db8::ff00:42:83290",
-        "2001:db8::ff00:42:832"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "「::」によるゼロ圧縮は1つのアドレスで1回だけ使える。B は2回使っているため不正。C は最終グループが5桁で不正。D は末尾が 832 になっており、元の 8329 と値が異なるため別アドレスになる。正解の A は先行ゼロの省略と1回の「::」圧縮を正しく使っている。",
-      "id": "q107",
-      "stem": "IPv6 アドレス 2001:0db8:0000:0000:0000:ff00:0042:8329 の省略表記として正しいものはどれか。",
-      "subtopic": "1.4 IPv6 アドレス表記",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "1、2、3",
-        "1、6、11",
-        "5、7、9",
-        "11、12、13"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "2.4GHz 帯のチャネルは互いに重なっており、干渉を避けて同時に使える組み合わせは 1、6、11。隣接チャネル同士は部分的に重なるため、近くの AP とはこの3つの範囲で割り当てる。",
-      "id": "q108",
-      "stem": "2.4GHz 帯の無線 LAN で、互いに干渉しないチャネルの組み合わせはどれか。",
-      "subtopic": "1.5 無線の原理（チャネル選択）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "ipconfig /all",
-        "ping -t",
-        "tracert",
-        "netstat -a"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "ipconfig /all で IP アドレス、サブネットマスク、デフォルトゲートウェイに加え、DNS サーバや DHCP の情報までまとめて確認できる。クライアント接続の切り分けでは、まず IP 設定の確認から始める。",
-      "id": "q109",
-      "stem": "Windows クライアントで、IP アドレス・サブネットマスク・デフォルトゲートウェイ・DNS サーバをまとめて確認するコマンドはどれか。",
-      "subtopic": "1.6 クライアント接続の確認",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "ip helper-address（DHCP サーバのアドレス）",
-        "ip dhcp pool の作成",
-        "spanning-tree portfast",
-        "switchport mode trunk"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "169.254.x.x は APIPA（リンクローカル）のアドレスで、DHCP でアドレスを取得できなかったサイン。DHCP の要求はブロードキャストのため別サブネットのサーバには届かない。ゲートウェイ（SVI）に ip helper-address を設定すると、要求がユニキャストでサーバへ中継される（DHCP リレー）。",
-      "id": "q110",
-      "stem": "ある VLAN のクライアントが 169.254.x.x のアドレスしか取得できない。DHCP サーバは別のサブネットにあり、クライアントのゲートウェイである SVI には中継の設定がない。SVI に必要な設定はどれか。",
-      "subtopic": "1.7 DHCPv4 リレーのトラブルシュート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "021A:2BFF:FE3C:4D5E",
-        "001A:2BFF:FE3C:4D5E",
-        "021A:2B3C:FFFE:4D5E",
-        "021A:2BFF:FF3C:4D5E"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "EUI-64 では MAC アドレスの中央に FFFE を挿入し、先頭バイトの U/L ビット（第7ビット）を反転させる。00 の第7ビットを反転すると 02 になるため、021A:2BFF:FE3C:4D5E が正しい。",
-      "id": "q111",
-      "stem": "MAC アドレス 00:1A:2B:3C:4D:5E から EUI-64 形式で生成されるインターフェース ID はどれか。",
-      "subtopic": "1.4 IPv6（EUI-64）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "WEP より通信速度が速い",
-        "SAE（同時認証）により、パスワード認証がオフラインの辞書攻撃に強くなった",
-        "暗号化を省略して接続を高速化する",
-        "2.4GHz 帯でのみ使える"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "WPA3 の個人向けモードは SAE（Simultaneous Authentication of Equals）を採用し、キャプチャした handshake からパスワードを試すオフライン辞書攻撃が成立しにくくなった。暗号化そのものを省くわけではない。",
-      "id": "q112",
-      "stem": "無線 LAN のセキュリティ規格 WPA3（パーソナル）の改善点として正しいものはどれか。",
-      "subtopic": "1.5 無線のセキュリティ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "電子レンジと Bluetooth 機器",
-        "光ファイバケーブルの曲げ",
-        "有線 LAN のスイッチングハブ",
-        "GPS 衛星の電波"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "電子レンジや Bluetooth は 2.4GHz 帯を使うため、同じ帯域の無線 LAN と干渉する。無線が不安定なときは、チャネルの混雑だけでなく、こうした帯域を共有する機器の存在も疑う。",
-      "id": "q113",
-      "stem": "2.4GHz 帯の無線 LAN で電波干渉の原因になりうるものはどれか。",
-      "subtopic": "1.5 無線の干渉要因",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "172.32.0.1",
-        "172.16.5.4",
-        "192.169.0.1",
-        "11.0.0.1"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "プライベートアドレスは 10.0.0.0/8、172.16.0.0/12（172.16〜172.31）、192.168.0.0/16 の3範囲。172.32 は範囲の外でパブリックアドレス。192.169 は 192.168 ではない点にも注意。",
-      "id": "q114",
-      "stem": "プライベート IPv4 アドレスに該当するものはどれか。",
-      "subtopic": "1.3 プライベートアドレス",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "アドレスプールの枯渇",
-        "DHCP リレーの設定漏れ",
-        "DNS サーバの障害",
-        "端末のケーブル断線"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "リレーの不備なら VLAN 全端末が影響を受ける。既存端末が正常で新規だけ取れず、プールに空きがないのなら、リース可能なアドレスが尽きたプール枯渇。リース期間の短縮やプール拡張が対処になる。",
-      "id": "q115",
-      "stem": "既存の端末は正常に IP アドレスを保持しているのに、新しく接続した端末だけがアドレスを取得できない。DHCP サーバのプール使用率は 100% だった。原因はどれか。",
-      "subtopic": "1.7 DHCP サーバのトラブルシュート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "ポート番号の割り振り",
-        "コネクタの汚れや損傷による光信号の減衰",
-        "IP アドレスの設定",
-        "VLAN の割り当て"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "光ファイバはコネクタ端面の汚れや傷で受信レベルが下がり、エラーやリンクダウンの原因になる。インターフェース／ケーブル診断（1.1）では、信号レベルと物理状態の確認が基本になる。",
-      "id": "q116",
-      "stem": "光ファイバ接続で、リンクが不安定になったり受信エラーが増えたりする物理的な原因として典型的なものはどれか。",
-      "subtopic": "1.1 光ファイバの信号とコネクタ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "192.168.1.0",
-        "192.168.1.64",
-        "192.168.1.127",
-        "192.168.1.255"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "/26 のブロックは 64 刻み。.64 のネットワークは .64〜.127 で、末尾の .127 がブロードキャストアドレス。ネットワークアドレス（.64）と対で覚える。",
-      "id": "q117",
-      "stem": "ネットワーク 192.168.1.64/26 のブロードキャストアドレスはどれか。",
-      "subtopic": "1.3 ブロードキャストアドレスの計算",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "Discover → Offer → Request → Ack",
-        "Offer → Discover → Ack → Request",
-        "Request → Discover → Offer → Ack",
-        "Ack → Offer → Request → Discover"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "DHCPv4 のアドレス取得は DORA の順：クライアントの Discover、サーバの Offer、クライアントの Request、サーバの Ack。途中で止まる段階を見れば、リレー・サーバ・応答のどこで詰まっているか切り分けられる。",
-      "id": "q118",
-      "stem": "DHCPv4 でアドレスを取得する際のメッセージの順序として正しいものはどれか。",
-      "subtopic": "1.7 DHCP の動作（DORA）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "2.4GHz より到達距離が長い",
-        "使えるチャネル数が多く、干渉を受けにくい",
-        "障害物を回り込む性質が強い",
-        "古い端末との互換性が高い"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "5GHz 帯はチャネル数が多く混雑しにくい反面、直進性が強く、壁などの障害物で減衰しやすいため到達距離は短め。2.4GHz は遠くまで届くが干渉源も多い。帯域の使い分けはこの特性で判断する。",
-      "id": "q119",
-      "stem": "5GHz 帯の無線 LAN の特徴として正しいものはどれか。",
-      "subtopic": "1.5 無線の帯域特性",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "デフォルトゲートウェイの誤り",
-        "DHCP サーバの停止",
-        "DNS サーバの設定誤り",
-        "無線の電波強度不足"
-      ],
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "IP アドレスでの通信（ping）ができて名前でだけ失敗するのは、名前解決の問題。ゲートウェイや回線が壊れていれば IP でも通らない。クライアントの DNS 設定を確認する。",
-      "id": "q120",
-      "stem": "クライアントからサーバへ IP アドレスでは ping が通るのに、ホスト名ではアクセスできない。疑うべき設定はどれか。",
-      "subtopic": "1.6 クライアント接続（名前解決）",
-      "type": "single"
-    },
-    {
-      "domain": "infra",
-      "examVersion": "v2.0",
-      "explanation": "スイッチの起動は、POST でハードウェアを診断し、ブートローダが IOS イメージを読み込んで起動し、最後に startup-config が running-config として適用される順序。起動の途中で止まる段階を見れば、ハードウェアかソフトウェアか設定かを切り分けられる。",
-      "id": "q121",
-      "items": [
-        "POST（電源投入時の自己診断）",
-        "ブートローダの実行",
-        "IOS イメージの読み込み",
-        "startup-config の適用"
-      ],
-      "stem": "スイッチの起動手順を、正しい順に並べ替えよ。",
-      "subtopic": "1.2 スイッチの起動順序",
-      "type": "order"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "リンクが即座にダウンし、トランクは形成されない",
-        "CDP がミスマッチを警告し、タグなしフレームが相手側の想定外の VLAN に届く恐れがある",
-        "自動的に小さい方の VLAN 番号に統一される",
-        "DTP により両端ともアクセスポートに変わる"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "ネイティブ VLAN が両端で異なると、CDP が Native VLAN mismatch を警告する。タグなしフレームは受信側のネイティブ VLAN で処理されるため、意図しない VLAN へフレームが漏れる（VLAN リーク）恐れがあり、セキュリティ上も問題になる。両端で一致させるのが原則。",
-      "id": "q201",
-      "stem": "2台のスイッチ間トランクで、両端のネイティブ VLAN が異なる設定になっている。起こりうる事象はどれか。",
-      "subtopic": "2.1 トランクとネイティブ VLAN",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "両端とも passive",
-        "片側 active、片側 passive",
-        "片側 on、片側 passive",
-        "両端とも auto"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "LACP では少なくとも一方が active でないと交渉が始まらないため、passive 同士ではチャネルは形成されない。on は LACP を使わず無条件に束ねるモードで、LACP のモードではない。auto は PAgP 側のモード名。",
-      "id": "q202",
-      "stem": "LACP で EtherChannel を形成できるモードの組み合わせはどれか。",
-      "subtopic": "2.1 EtherChannel（LACP）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "物理インターフェースを束ねるための仮想インターフェース",
-        "VLAN ごとの論理的なレイヤ3インターフェースで、その VLAN のホストのゲートウェイになる",
-        "コンソール接続専用の管理インターフェース",
-        "STP のルートブリッジを示す識別子"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "SVI（Switch Virtual Interface）は VLAN に対応する L3 インターフェース。マルチレイヤスイッチでは、SVI に IP アドレスを設定するとその VLAN のホストのデフォルトゲートウェイとして動作し、VLAN 間ルーティングが可能になる。",
-      "id": "q203",
-      "stem": "SVI（Switch Virtual Interface）の説明として正しいものはどれか。",
-      "subtopic": "2.1 SVI",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "Ethernet ケーブル経由で、アクセスポイントや IP 電話へデータと電力を一緒に供給できる",
-        "2本のケーブルで帯域を2倍にできる",
-        "通信を暗号化して盗聴を防げる",
-        "1つのポートで複数の VLAN を扱える"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "PoE（Power over Ethernet）は、データ通信に使う Ethernet ケーブルで電力も供給する仕組み。電源の取りにくい場所のアクセスポイントや IP 電話、天井のカメラなどを、電源工事なしに設置できる。",
-      "id": "q204",
-      "stem": "PoE（Power over Ethernet）の説明として正しいものはどれか。",
-      "subtopic": "2.2 PoE",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "そのポートをトランクポートに設定する",
-        "アクセスポートにデータ用 VLAN と音声 VLAN の両方を設定する",
-        "電話と PC それぞれに物理ポートを分けなければ構成できない",
-        "電話とスイッチの間で EtherChannel を組む"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "IP 電話は音声を音声 VLAN、背後の PC の通信をデータ VLAN に分けて中継する。スイッチ側はアクセスポートのまま、音声 VLAN を併せて設定するのが標準的な構成で、ポートをトランク化する必要はない。",
-      "id": "q205",
-      "stem": "1つのスイッチポートに IP 電話を接続し、電話の背後に PC をつなぐ。音声とデータを別 VLAN に分けるためのスイッチ側の設定はどれか。",
-      "subtopic": "2.2 音声 VLAN（エッジポート属性）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "show cdp neighbors detail",
-        "show vlan brief",
-        "show ip route",
-        "show spanning-tree"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "CDP は隣接する Cisco 機器の機器名、接続ポート、IP アドレスなどを教えてくれるため、実際の配線と構成図の突き合わせに使える。ベンダー混在環境では LLDP（show lldp neighbors）を使う。",
-      "id": "q206",
-      "stem": "構成図（ネットワークドキュメント）の正確性を検証するため、実際に接続されている隣接機器とそのポートを確認したい。適したコマンドはどれか。",
-      "subtopic": "2.3 CDP／LLDP によるドキュメント検証",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "通常の ping",
-        "拡張 ping",
-        "traceroute",
-        "show interfaces"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "拡張 ping では送信元アドレス／インターフェース、パケットサイズ、回数などを指定できる。特定の送信元からでないと再現しない到達性の問題を切り分けるのに使う。traceroute は経路の確認が主目的。",
-      "id": "q207",
-      "stem": "到達性の切り分けで、送信元インターフェースを指定して疎通を確認したい。適した手段はどれか。",
-      "subtopic": "2.4 切り分けツール（拡張 ping）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "ポート番号が最も小さいポート",
-        "ルートブリッジへの累積コストが最小になるポート",
-        "常にブロッキング状態になるポート",
-        "DR に選ばれたポート"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "ルートポートは、非ルートスイッチごとに1つ選ばれる「ルートブリッジへの最短路」のポート。受信した BPDU のパスコストを比較して決まる。DR は OSPF の用語で STP にはない。",
-      "id": "q208",
-      "stem": "Rapid PVST+ におけるルートポートの説明として正しいものはどれか。",
-      "subtopic": "2.5 Rapid PVST+（ルートポート）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "MAC アドレスが最も大きいスイッチ",
-        "ブリッジ ID が最も小さいスイッチ",
-        "ポート数が最も多いスイッチ",
-        "最初に起動したスイッチ"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "ルートブリッジはブリッジ ID（ブリッジプライオリティ＋MAC アドレス）の比較で決まり、最も小さいものが選ばれる。プライオリティが同点なら MAC アドレスの小さい方。意図したスイッチをルートにするにはプライオリティを下げる設定を行う。",
-      "id": "q209",
-      "stem": "Rapid PVST+ でルートブリッジに選ばれるのはどのようなスイッチか。",
-      "subtopic": "2.5 Rapid PVST+（ルートブリッジ選出）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0,
-        1
-      ],
-      "choices": [
-        "PortFast はエッジポートを即座にフォワーディング状態へ遷移させる",
-        "BPDU ガードは、PortFast 有効ポートが BPDU を受信するとそのポートを err-disable 状態にする",
-        "PortFast はスイッチ間リンクに設定することが推奨される",
-        "BPDU ガードは、受信した BPDU を破棄して通信を継続させる"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "PortFast は端末向けのエッジポートで、STP の待機を省いて即座に転送状態にする機能。スイッチ間リンクに使うものではない。BPDU ガードは、そのポートにスイッチが誤接続されて BPDU が届いた場合に、ループを防ぐためポートを err-disable（無効化）する。BPDU を破棄して継続するのではない。",
-      "id": "q210",
-      "stem": "PortFast と BPDU ガードについて、正しいものを2つ選べ。",
-      "subtopic": "2.5 PortFast と BPDU ガード",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "switchport trunk allowed vlan に VLAN 30 が含まれていない",
-        "ネイティブ VLAN の不一致",
-        "STP でポートがブロッキングされている",
-        "DTP のネゴシエーション失敗"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "allowed vlan で許可されていない VLAN のフレームはトランクを通過できない。ネイティブ VLAN の不一致が影響するのはネイティブ VLAN（この場合は VLAN 1）だけ。トランク自体は他の VLAN が通っている時点で形成されている。",
-      "id": "q211",
-      "stem": "トランクポートで VLAN 10 と VLAN 20 は通信できるのに、VLAN 30 だけが対向スイッチへ届かない。トランクの設定を確認すべき点はどれか。",
-      "subtopic": "2.1 トランクの allowed VLAN",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "スイッチのホスト名",
-        "ポート番号が連番であること",
-        "speed・duplex・VLAN などの設定がメンバー全ポートで一致していること",
-        "ケーブルの色がそろっていること"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "EtherChannel は、束ねるポートの設定（speed、duplex、アクセス／トランクと許可 VLAN など）がそろっていないと形成されない、またはメンバーから外される。物理的な近さや番号は要件ではない。",
-      "id": "q212",
-      "stem": "EtherChannel を形成するために、メンバーポート間で一致させなければならないものはどれか。",
-      "subtopic": "2.1 EtherChannel の要件",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "Cisco 独自のプロトコルで、同社製品同士でしか使えない",
-        "IEEE の標準規格で、ベンダが異なる機器同士でも隣接情報を確認できる",
-        "ルーティングプロトコルの一種である",
-        "通信を暗号化するためのプロトコルである"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "LLDP は IEEE 802.1AB の標準規格でベンダ中立。Cisco 独自の CDP と違い、混在環境でも隣接確認に使える。どちらも構成ドキュメントの検証に用いる発見プロトコルで、ルーティングや暗号化は行わない。",
-      "id": "q213",
-      "stem": "LLDP の説明として正しいものはどれか。",
-      "subtopic": "2.3 LLDP",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "セグメントごとに選ばれ、ルートブリッジへの最短路側でフレームを転送するポート",
-        "常にブロッキング状態になるポート",
-        "エンドデバイスを接続するためのポート",
-        "コンソール接続に使う管理ポート"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "指定ポートは、セグメントごとに「ルートブリッジに最も近いスイッチ」のポートが選ばれ、そのセグメントのフレームをルート方向へ転送する。ルートポートが「自スイッチの出口」なら、指定ポートは「セグメント側の入口」にあたる。",
-      "id": "q214",
-      "stem": "Rapid PVST+ における指定ポート（designated port）の説明として正しいものはどれか。",
-      "subtopic": "2.5 Rapid PVST+（指定ポート）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "機器内部の温度やファンの状態",
-        "実際に流れているフレームの送信元・宛先やプロトコルの中身",
-        "将来発生する障害の予測",
-        "設定ミスの自動修正"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "パケットキャプチャは、線の上を実際に流れるフレームそのものを見る手段。「設定上は送っているはず」と「実際に届いている」が食い違うときの切り分けに使う。機器の状態確認には show コマンド類を使う。",
-      "id": "q215",
-      "stem": "トラブルシュートでパケットキャプチャの出力を読むと分かることはどれか。",
-      "subtopic": "2.4 パケットキャプチャ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "1〜255",
-        "1〜1005",
-        "1024〜4094",
-        "制限はない"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "通常範囲（normal range）は 1〜1005 で、この範囲は VLAN データベースに保存される標準的な VLAN。1006〜4094 は拡張範囲（extended range）。",
-      "id": "q216",
-      "stem": "VLAN の通常範囲（normal range）はどれか。",
-      "subtopic": "2.2 VLAN の範囲",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0,
-        2
-      ],
-      "choices": [
-        "接続している機器の IP アドレス",
-        "スイッチの内部温度",
-        "そのポートの接続先機器の機種やポート番号",
-        "スイッチの消費電力"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "CDP では隣接機器のデバイス名、接続ポート、IP アドレス、機種や IOS のバージョンなどが分かる。温度や消費電力のような環境情報は CDP の対象ではない。",
-      "id": "q217",
-      "stem": "CDP で確認できる情報を2つ選べ。",
-      "subtopic": "2.3 CDP で得られる情報",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "5つ（Initial、Blocking、Listening、Learning、Forwarding）",
-        "3つ（Discarding、Learning、Forwarding）",
-        "2つ（Blocking、Forwarding）",
-        "4つ（Blocking、Listening、Disabled、Forwarding）"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "Rapid PVST+（RSTP 系）は状態を Discarding／Learning／Forwarding の3つに整理した。従来 STP の Blocking と Listening が Discarding に統合され、収束が速くなった。",
-      "id": "q218",
-      "stem": "Rapid PVST+ のポート状態の組み合わせとして正しいものはどれか。",
-      "subtopic": "2.5 Rapid PVST+ のポート状態",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "スイッチの電源が入っていること",
-        "管理者権限でログインしていること",
-        "対象 VLAN が存在し、その VLAN でアクティブなポートがあること",
-        "STP が無効化されていること"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "SVI は、対応する VLAN が作成されていて、その VLAN に属するポート（アクセスまたはトランク）がリンクアップしていないと up/up にならない。SVI が down のままのときは、この条件を順に確認する。",
-      "id": "q219",
-      "stem": "SVI が up/up になるために必要な条件はどれか。",
-      "subtopic": "2.1 SVI の up 条件",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "802.3af（PoE）と 802.3at（PoE+）",
-        "802.1Q と 802.1D",
-        "802.11a と 802.11b",
-        "802.3u と 802.3z"
-      ],
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "PoE の規格は 802.3af（最大 15.4W）と 802.3at（PoE+、最大 30W）。接続する機器（AP、IP 電話、カメラ）の消費電力に合う規格のポートを用意する。802.1Q はトランク、802.11 系は無線 LAN の規格。",
-      "id": "q220",
-      "stem": "PoE の規格として正しい組み合わせはどれか。",
-      "subtopic": "2.2 PoE の規格",
-      "type": "single"
-    },
-    {
-      "domain": "switching",
-      "examVersion": "v2.0",
-      "explanation": "STP の収束は、まずルートブリッジを1台決め、次に各スイッチがルートへの出口（ルートポート）を決め、各セグメントの代表（指定ポート）が決まり、残ったポートがブロッキングになってループを断つ順序で進む。",
-      "id": "q221",
-      "items": [
-        "ルートブリッジの選出",
-        "各スイッチのルートポート決定",
-        "各セグメントの指定ポート決定",
-        "不要なポートをブロッキング"
-      ],
-      "stem": "STP が収束するまでの流れを、正しい順に並べ替えよ。",
-      "subtopic": "2.5 STP の収束手順",
-      "type": "order"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "192.168.1.1",
-        "192.168.2.1",
-        "192.168.3.1",
-        "メトリックが最小の 192.168.1.1 と 192.168.3.1 の両方"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "ルータはまず最長一致（longest match）で経路を選ぶ。宛先 10.1.2.5 に一致する中で最もプレフィックスが長いのは 10.1.2.0/24 なので、ネクストホップは 192.168.3.1。メトリックや AD は、同じプレフィックスの経路が複数ある場合に初めて比較される。",
-      "id": "q001",
-      "stem": "ルータのルーティングテーブルに次のエントリがある。宛先 10.1.2.5 へのパケットはどのネクストホップへ転送されるか。\nO 10.0.0.0/8 [110/2] via 192.168.1.1\nO 10.1.0.0/16 [110/3] via 192.168.2.1\nO 10.1.2.0/24 [110/2] via 192.168.3.1",
-      "subtopic": "ルーティングテーブルの解釈",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "OSPF の経路（メトリックが動的に最適化されるため）",
-        "静的ルート（AD が 1 で OSPF の 110 より小さいため）",
-        "両方が載り、負荷分散される",
-        "後に学習・設定された方"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "異なる経路情報源から同じプレフィックスが得られた場合、AD（信頼度）が最も小さいものが採用される。AD は直接接続 0、静的ルート 1、OSPF 110。よって静的ルートが載る。メトリックは同一の経路情報源内での比較に使う。",
-      "id": "q002",
-      "stem": "同じプレフィックス 172.16.0.0/16 について、OSPF で学習した経路と、静的ルートで設定した経路の両方が存在する。ルーティングテーブルに載るのはどちらか。",
-      "subtopic": "AD（アドミニストレーティブディスタンス）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "通常の静的ルートより大きな AD を設定し、主経路が落ちたときだけテーブルに現れる予備経路",
-        "複数のネクストホップへ同時に転送する負荷分散用の静的ルート",
-        "DHCP で配布される静的ルート",
-        "IPv6 でのみ使える静的ルート"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "フローティング静的ルートは、静的ルートにあえて大きな AD（例：200）を設定したもの。通常時は AD の小さい主経路（動的ルーティング等）が優先され、主経路が消えたときだけこの静的ルートがテーブルに現れてバックアップとして働く。",
-      "id": "q003",
-      "stem": "フローティング静的ルートの説明として正しいものはどれか。",
-      "subtopic": "フローティング静的ルート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "auto-cost reference-bandwidth の設定が2台で異なる",
-        "Hello／Dead インターバルが2台で一致していない",
-        "DR 選挙がまだ終わっていない",
-        "OSPF のプロセス ID が2台で異なる"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "OSPF の隣接形成には、エリア ID、Hello／Dead インターバル、サブネット（ネットワークタイプによる）、認証などの一致が必要。Hello が届いていてもパラメータが一致しなければ隣接は形成されない。プロセス ID はルータ内部でのみ意味を持つため、相手と異なっていても問題ない。参照帯域幅の不一致はメトリック計算に影響するだけで、隣接形成は妨げない。",
-      "id": "q004",
-      "stem": "2台のルータ間で OSPFv2 の隣接（adjacency）が FULL にならない。show ip ospf neighbor では相手が表示されず、Hello は届いている。原因として最も可能性が高いものはどれか。",
-      "subtopic": "OSPF 隣接のトラブルシュート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "ルータ ID が最も小さいルータが DR になる",
-        "OSPF プライオリティが最も高く、同点ならルータ ID が最も大きいルータが DR になる",
-        "最初に起動したルータが常時 DR であり続ける（プリエンプションがある）",
-        "DR はエリア内の全ルータの投票で毎回選び直される"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "DR 選挙はプライオリティ（既定値 1、0 は選挙対象外）が最も高いルータが当選し、同点の場合はルータ ID が最も大きい方。なお OSPF の DR 選挙にはプリエンプション（横取り）がないため、後から起動したプライオリティの高いルータが既存の DR を置き換えることはない。",
-      "id": "q005",
-      "stem": "ブロードキャスト型ネットワークでの OSPF DR（Designated Router）の選挙について、正しいものはどれか。",
-      "subtopic": "OSPF DR/BDR 選挙",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "最も小さい物理インターフェースの IP アドレス",
-        "稼働中ループバックインターフェースのうち最も大きい IP アドレス。なければ物理インターフェースのうち最も大きい IP アドレス",
-        "ホスト名から自動生成される",
-        "MAC アドレスの下位4オクテット"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "ルータ ID の決定順序は、(1) router-id での明示設定、(2) ループバックインターフェースの最大 IP アドレス、(3) 稼働中物理インターフェースの最大 IP アドレス。安定した ID が必要な場合は明示設定が推奨される。",
-      "id": "q006",
-      "stem": "router-id コマンドで明示設定されていない場合、OSPF のルータ ID はどのように決まるか。",
-      "subtopic": "OSPF ルータ ID",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "ネクストホップの MAC アドレスの指定",
-        "送出インターフェースの指定",
-        "AD を 1 以外に変更すること",
-        "IPv6 ユニキャストルーティングの無効化"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "リンクローカルアドレスはリンクごとに意味を持つため、どのインターフェースから出すかが分からなければ転送できない。よって ipv6 route コマンドでネクストホップにリンクローカルアドレスを使う場合は、送出インターフェースの指定が必須になる（完全指定型）。",
-      "id": "q007",
-      "stem": "IPv6 の静的ルートで、ネクストホップにリンクローカルアドレス（fe80::/10）を指定する場合に必須となるものはどれか。",
-      "subtopic": "IPv6 静的ルート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "仮想 IP 宛てのトラフィックを実際に転送しているのはルータ B",
-        "仮想 IP 宛てのトラフィックを実際に転送しているのはルータ A で、B は A の障害時に引き継ぐ",
-        "A と B が交互にパケットを転送して負荷分散している",
-        "Active は設定が有効という意味で、転送は常時 B が行う"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "HSRP では Active ルータが仮想 IP／仮想 MAC 宛てのトラフィックを転送し、Standby ルータは Active の障害を検知すると役割を引き継ぐ。負荷分散したい場合はグループを複数作り、グループごとに Active を分ける（HSRP 自体は1グループでは負荷分散しない）。",
-      "id": "q008",
-      "stem": "show standby brief の出力で、あるグループについてルータ A が Active、ルータ B が Standby と表示されている。この状態の説明として正しいものはどれか。",
-      "subtopic": "FHRP（HSRP）の状態解釈",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0,
-        1
-      ],
-      "choices": [
-        "2台のエリア ID が一致していない",
-        "一方のインターフェースが passive-interface に設定されている",
-        "2台の OSPF プロセス ID が異なっている",
-        "2台のホスト名が似ている"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "エリア ID の不一致は隣接形成を妨げる。また passive-interface のインターフェースでは Hello を送信しないため、そのリンクでは隣接が形成されない。プロセス ID はルータ内部の識別子なので相手と異なってよい。ホスト名は無関係。",
-      "id": "q009",
-      "stem": "OSPFv2 の隣接が形成されない原因として正しいものを2つ選べ。",
-      "subtopic": "OSPF 隣接のトラブルシュート",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "110 はメトリック、2 は AD を表す",
-        "110 は AD、2 はメトリックを表す",
-        "110 はホップ数、2 は帯域を表す",
-        "110 は OSPF のエリア番号、2 はプロセス ID を表す"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "[110/2] の形式は [AD／メトリック]。この経路は OSPF（コード O）で学習され、AD は OSPF の既定値 110、メトリック（コスト）は 2。via の後がネクストホップ、最後が送出インターフェース。",
-      "id": "q010",
-      "stem": "ルーティングテーブルの行「O 10.1.2.0/24 [110/2] via 192.168.3.1, 00:00:15, GigabitEthernet0/0」について、正しい説明はどれか。",
-      "subtopic": "ルーティングテーブルの解釈",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "コスト 5 の経路",
-        "コスト 20 の経路",
-        "先に学習した方",
-        "ランダムに選ばれる"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "同じプロトコル・同じ宛先なら、メトリック（OSPF ではコスト）が小さい経路が選ばれる。プレフィックス長（longest match）と AD の比較を通過したあとの、最後の判定要素がメトリック。",
-      "id": "q011",
-      "stem": "OSPF で同じ宛先ネットワークへの経路が2つあり、コストが 5 と 20 だった。ルーティングテーブルに載るのはどちらか。",
-      "subtopic": "3.1 メトリックによる経路選択",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "1",
-        "10",
-        "100",
-        "0"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "コスト = 参照帯域（10^8 bps）÷ リンク帯域。1Gbps では 10^8 ÷ 10^9 = 0.1 となり、最小値の 1 に切り上げられる。このためデフォルト設定では 100Mbps 以上のリンクはすべてコスト 1 になり区別できない。高速リンクを区別するには参照帯域を引き上げる。",
-      "id": "q012",
-      "stem": "OSPF のコスト計算で、参照帯域がデフォルト（10^8 bps）のとき、1Gbps リンクのコストはいくつか。",
-      "subtopic": "3.3 OSPF のコスト",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "IPv4 専用のプロトコルである",
-        "ネイバとの通信にリンクローカルアドレスを使う",
-        "DR／BDR の選出がない",
-        "エリアの概念がない"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "OSPFv3 は IPv6 用で、ネイバとのやり取りにはリンクローカルアドレスを使う。DR／BDR の選出やエリアの概念は OSPFv2 と同様に存在する。ルータ ID は引き続き 32 ビットの値を使う。",
-      "id": "q013",
-      "stem": "OSPFv3 の特徴として正しいものはどれか。",
-      "subtopic": "3.3 OSPFv3",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "VRRP は Cisco 独自のプロトコルである",
-        "VRRP は標準規格（RFC）で、異なるベンダの機器間でも構成できる",
-        "VRRP では仮想 IP アドレスを持てない",
-        "HSRP は標準規格である"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "HSRP は Cisco 独自、VRRP は RFC で標準化された FHRP。マルチベンダ環境でゲートウェイを冗長化するなら VRRP が候補になる。どちらも仮想 IP／仮想 MAC による冗長化の仕組みは共通。",
-      "id": "q014",
-      "stem": "VRRP と HSRP の違いとして正しいものはどれか。",
-      "subtopic": "3.4 VRRP と HSRP",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "/32",
-        "/24",
-        "/0",
-        "/128"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "IPv4 のホストルートは、特定の1台だけを指す /32。/0 はデフォルトルート、/128 は IPv6 でのホストルートにあたる。",
-      "id": "q015",
-      "stem": "IPv4 のホストルートを表すプレフィックス長はどれか。",
-      "subtopic": "3.2 ホストルート",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "DR の選出方法が同じ",
-        "broadcast では DR／BDR を選出するが、point-to-point では選出しない",
-        "point-to-point ではエリアを使わない",
-        "broadcast では hello を送らない"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "マルチアクセス（broadcast）では DR／BDR が隣接の中心になる。1対1の point-to-point では選出自体が不要で、その分ネイバ確立も速い。エリアの使い方や hello の送信はどちらのタイプでも共通。",
-      "id": "q016",
-      "stem": "OSPF のネットワークタイプ broadcast と point-to-point の違いとして正しいものはどれか。",
-      "subtopic": "3.3 OSPF のネットワークタイプ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "手動設定 → ループバックの最大アドレス → 物理インターフェースの最大アドレス",
-        "物理インターフェースの最大アドレス → 手動設定 → ループバック",
-        "起動した順に若いインターフェース",
-        "ランダムに決まる"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "ルータ ID は、手動設定（router-id コマンド）が最優先。なければループバックインターフェースの最大 IP、それもなければ物理インターフェースの最大 IP が選ばれる。再現性のため手動設定が推奨される。",
-      "id": "q017",
-      "stem": "OSPF のルータ ID の決定順序として正しいものはどれか。",
-      "subtopic": "3.3 ルータ ID の決定",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "静的ルートは常に動的ルートより優先される",
-        "ネクストホップへの経路が存在しないと、静的ルートはテーブルに載らない",
-        "静的ルートはメトリックを持たない",
-        "静的ルートは再帰参照ができない"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "静的ルートは、ネクストホップへの到達性がルーティングテーブルで解決できて初めて有効になる（再帰参照）。ネクストホップに届く経路が消えると、その静的ルートもテーブルから消える。",
-      "id": "q018",
-      "stem": "静的ルートの動作として正しいものはどれか。",
-      "subtopic": "3.2 静的ルートと再帰参照",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "0000.0c07.acXX の XX は IP アドレスの下位",
-        "0000.0c07.acXX の XX は VLAN 番号",
-        "0000.0c07.acXX の XX は HSRP グループ番号",
-        "仮想 MAC はルータの実 MAC と同じ"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "HSRP の仮想 MAC は 0000.0c07.ac の後にグループ番号（16進2桁）が続く形式。グループ番号が違うと仮想 MAC も別物になり、c07 のケースのように別グループとして動作してしまう。",
-      "id": "q019",
-      "stem": "HSRP の仮想 MAC アドレスについて正しいものはどれか。",
-      "subtopic": "3.4 HSRP の仮想 MAC",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "発信インターフェースの指定も必要になる",
-        "グローバルアドレスでは設定できない",
-        "AD を必ず 1 にする",
-        "ルータ ID が必要になる"
-      ],
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "リンクローカルアドレスはそのリンクでしか意味を持たないため、どのリンクのネクストホップなのかを発信インターフェースで特定する必要がある。IPv6 の静的ルートでよくある設定漏れ。",
-      "id": "q020",
-      "stem": "IPv6 の静的ルートで、ネクストホップにリンクローカルアドレスを指定する場合に必要なことはどれか。",
-      "subtopic": "3.2 IPv6 静的ルート",
-      "type": "single"
-    },
-    {
-      "domain": "routing",
-      "examVersion": "v2.0",
-      "explanation": "OSPF の隣接は、hello で互いを確認する 2-Way、マスタ／スレーブを決める ExStart、要約（DBD）を交換する Exchange、不足分を要求・受信する Loading を経て、データベースが同期した Full に至る。どの状態で止まるかで、MTU や認証などの切り分けポイントが変わる。",
-      "id": "q021",
-      "items": [
-        "2-Way（hello で相互確認）",
-        "ExStart（マスタ／スレーブ決定）",
-        "Exchange（DBD の交換）",
-        "Loading（不足分の要求と受信）",
-        "Full（データベース同期完了）"
-      ],
-      "stem": "OSPF の隣接が確立するまでの状態遷移を、正しい順に並べ替えよ。",
-      "subtopic": "3.3 OSPF の隣接状態",
-      "type": "order"
-    },
-    {
-      "answer": [
-        0,
-        1
-      ],
-      "choices": [
-        "ペイロード全体を暗号化する",
-        "認証・認可・アカウンティングを個別に扱える",
-        "UDP の 1812／1813 番ポートを使う",
-        "パスワードのみを暗号化する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "TACACS+ は TCP 49 を使い、パケット全体を暗号化し、認証・認可・アカウンティングを分離できるのが特徴。UDP を使いパスワードのみ暗号化するのは RADIUS。機器管理の AAA では、コマンド単位の認可ができる TACACS+ がよく選ばれる。",
-      "id": "q401",
-      "stem": "TACACS+ の特徴として正しいものを2つ選べ。",
-      "subtopic": "4.1 AAA（TACACS+ と RADIUS）",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "TFTP",
-        "SCP",
-        "FTP",
-        "Telnet"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "SCP（と SFTP）は SSH を土台にするため、転送内容が暗号化される。TFTP や FTP は平文で認証情報も流れるため、設定ファイルや IOS イメージの受け渡しには安全な転送手段を使う。",
-      "id": "q402",
-      "stem": "ルータの設定ファイルを管理サーバへコピーしたい。転送中の盗聴を防げる手段はどれか。",
-      "subtopic": "4.2 安全なファイル転送（SFTP／SCP）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "端末ごとにグローバル IP アドレスを1つずつ割り当てる",
-        "送信元ポート番号で変換を区別する",
-        "MAC アドレスでセッションを区別する",
-        "DNS のラウンドロビンで振り分ける"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "PAT（NAT オーバーロード）は、複数のプライベートアドレスを1つのグローバルアドレスに変換し、セッションの区別に送信元ポート番号を使う。戻りの通信は変換テーブルで対応付けられる。",
-      "id": "q403",
-      "stem": "PAT（NAT オーバーロード）で、社内の多数の端末が1つのグローバル IP アドレスを共有してインターネットに出られる理由はどれか。",
-      "subtopic": "4.3 NAT／PAT",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "静的 NAT",
-        "動的 NAT（プール）",
-        "PAT（オーバーロード）",
-        "NAT は使わずブリッジで接続する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "外部から常に同じアドレスで到達させるには、内部アドレスとグローバルアドレスを1対1で固定する静的 NAT が必要。動的 NAT や PAT は内部から外部への通信が主用途で、外部起点の到達性は保証しない。",
-      "id": "q404",
-      "stem": "社内の Web サーバを、固定のグローバル IP アドレスでインターネットに公開したい。適した NAT の方式はどれか。",
-      "subtopic": "4.3 静的 NAT",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "A レコード",
-        "AAAA レコード",
-        "MX レコード",
-        "PTR レコード"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "メールの配送先は MX レコードで示される。Web への名前解決（A／AAAA）が正常でも、MX が欠けていたり誤っていたりするとメールだけが届かない。名前解決の切り分けでは、用途ごとに見るレコードが違う。",
-      "id": "q405",
-      "stem": "Web サイトには名前でアクセスできるのに、そのドメイン宛のメールが届かない。メール配送に関わる DNS レコードとして確認すべきものはどれか。",
-      "subtopic": "4.4 DNS レコードの診断",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0,
-        1
-      ],
-      "choices": [
-        "AAAA レコードは名前と IPv6 アドレスを対応付ける",
-        "PTR レコードは IP アドレスから名前を引く逆引きに使う",
-        "CNAME レコードはメールサーバを指定する",
-        "NS レコードは別名（エイリアス）を指定する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "AAAA は IPv6 版のアドレスレコード、PTR は逆引き用。CNAME は別名の指定、NS は権威ネームサーバの指定で、C と D は説明が入れ替わっている。",
-      "id": "q406",
-      "stem": "DNS レコードの説明として正しいものを2つ選べ。",
-      "subtopic": "4.4 DNS レコードの種類",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "トランスポートモード",
-        "トンネルモード",
-        "ネイティブモード",
-        "ブリッジモード"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "トンネルモードは元の IP パケット全体を暗号化し、新しい IP ヘッダを付けて送るため、拠点間 VPN で内部のアドレス体系を隠せる。トランスポートモードはペイロードだけを暗号化し、元のヘッダを残す（主にホスト間通信で使用）。",
-      "id": "q407",
-      "stem": "サイト間 IPsec VPN で、元の IP パケット全体を暗号化し、新しい IP ヘッダを付けて送るモードはどれか。",
-      "subtopic": "4.5 IPsec VPN（トンネルモード）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "送信元 IP アドレスのみ",
-        "送信元・宛先 IP アドレス、プロトコル、ポート番号",
-        "送信元 MAC アドレスのみ",
-        "VLAN ID のみ"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "拡張 ACL は宛先やポート番号まで条件にできるため、「Web サーバへの 443 だけ許可」のような細かい制御ができる。標準 ACL は送信元 IP のみ。配置の目安は、拡張 ACL は送信元の近く、標準 ACL は宛先の近く。",
-      "id": "q408",
-      "stem": "拡張 ACL がフィルタ条件に使えるものはどれか。",
-      "subtopic": "4.6 ACL（標準と拡張）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "DHCP 通信を監視し、正規サーバ以外からの応答を遮断して、IP と MAC の対応表（バインディングテーブル）を作る",
-        "クライアントへ IP アドレスを自動で配布する",
-        "ARP パケットを暗号化して盗聴を防ぐ",
-        "ブロードキャストを全ポートへ転送して到達性を確保する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "DHCP スヌーピングは、信頼できないポートからの DHCP サーバ応答（不正サーバ）を遮断し、正規のやり取りからバインディングテーブルを構築する。このテーブルは DAI など他の L2 セキュリティ機能の土台にもなる。",
-      "id": "q409",
-      "stem": "DHCP スヌーピングの役割として正しいものはどれか。",
-      "subtopic": "4.7 DHCP スヌーピング",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "バインディングテーブルと ARP の内容を照合し、不正な ARP を破棄する",
-        "ARP の応答速度を高速化する",
-        "DHCP サーバを冗長化する",
-        "1ポートに接続できる MAC アドレス数を制限する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "DAI（Dynamic ARP Inspection）は、DHCP スヌーピングのバインディングテーブルと照合して、送信元 IP と MAC の組み合わせが正しくない ARP を破棄する。ARP スプーフィング（なりすまし）への対策。MAC 数を制限するのはポートセキュリティの役割。",
-      "id": "q410",
-      "stem": "DAI（Dynamic ARP Inspection）の動作として正しいものはどれか。",
-      "subtopic": "4.7 DAI（動的 ARP 検査）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "接続された端末の MAC アドレスを自動学習し、設定として取り込む機能",
-        "ポートの速度を自動で固定する機能",
-        "VLAN の割り当てを自動で固定する機能",
-        "認証サーバと連携して端末を認証する機能"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "ポートセキュリティのスティッキー学習は、最初に接続された端末の MAC を学習して running-config に取り込む。これにより、許可する端末を1台ずつ手入力しなくても、接続された機器だけを許可できる。端末認証は 802.1X の役割。",
-      "id": "q411",
-      "stem": "ポートセキュリティのスティッキー（sticky）学習とは何か。",
-      "subtopic": "4.7 ポートセキュリティ（スティッキー学習）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "ブロードキャストなどの流量がしきい値を超えると、そのポートの転送を制限する",
-        "雷雨の接近を検知して機器を停止する",
-        "ポートを常時遮断して安全を確保する",
-        "DHCP のブロードキャストを止める"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "ストームコントロールは、ブロードキャスト／マルチキャスト／ユニキャストの流量を監視し、しきい値を超えたら制限することで、ループ等によるブロードキャストストームの拡大を抑える L2 の保護機能。",
-      "id": "q412",
-      "stem": "ストームコントロールの役割として正しいものはどれか。",
-      "subtopic": "4.7 ストームコントロール",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "信頼できないポートからのルータ広告（RA）を破棄し、端末が偽のゲートウェイを掴むのを防ぐ",
-        "IPv6 の通信そのものを無効化する",
-        "DNS の応答を検証する",
-        "ARP パケットを検査する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "RA ガードは、端末側のポートでルータ広告（RA）を受け付けないようにし、不正な機器が「自分がルータだ」と名乗って通信を迂回させる攻撃を防ぐ。ARP の検査は DAI の役割。",
-      "id": "q413",
-      "stem": "RA ガード（IPv6 RA Guard）の役割として正しいものはどれか。",
-      "subtopic": "4.7 RA ガード",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "送信元の近く",
-        "宛先の近く",
-        "インターネット境界のみ",
-        "配置場所で効果は変わらない"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "標準 ACL は送信元アドレスしか見られないため、送信元の近くに置くと「その送信元から他の宛先への正規の通信」まで止めてしまう。宛先の近くに置くことで、影響をその宛先向けだけに絞れる。拡張 ACL は条件が細かいため送信元の近くが目安。",
-      "id": "q414",
-      "stem": "標準 ACL の配置場所の目安として正しいものはどれか。",
-      "subtopic": "4.6 標準 ACL の配置",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "inside local アドレス",
-        "inside global アドレス",
-        "outside local アドレス",
-        "outside global アドレス"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "inside local は、内部ネットワークで実際に使われているアドレス（この例では 192.168.1.10）。インターネット側に見える 203.0.113.10 が inside global。inside／outside は「自組織の内側か外側か」、local／global は「内部で見た姿か外部で見た姿か」の組み合わせ。",
-      "id": "q415",
-      "stem": "社内サーバ 192.168.1.10 を、静的 NAT で 203.0.113.10 として公開している。192.168.1.10 は NAT の用語で何と呼ばれるか。",
-      "subtopic": "4.3 NAT の用語（inside local）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "宛先アドレスを反転させたもの",
-        "「どこまで一致すれば許可か」を表す、通常のサブネットマスクとはビットの意味が逆の値",
-        "ポート番号の範囲指定",
-        "プロトコル番号の一覧"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "ワイルドカードマスクは、0 のビットが「一致必須」、1 のビットが「無視」を表し、サブネットマスクとは 0／1 の意味が逆。例：192.168.1.0/24 の範囲は 0.0.0.255 と書く。",
-      "id": "q416",
-      "stem": "ACL のワイルドカードマスクとは何か。",
-      "subtopic": "4.6 ワイルドカードマスク",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "1〜99",
-        "100〜199",
-        "200〜299",
-        "1000〜1099"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "番号付き標準 ACL は 1〜99（拡張範囲 1300〜1999）。拡張 ACL は 100〜199（拡張範囲 2000〜2699）。番号の範囲で ACL の種類が決まる。",
-      "id": "q417",
-      "stem": "番号付き標準 ACL に使える番号の範囲はどれか。",
-      "subtopic": "4.6 ACL の番号範囲",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "機器へのログイン試行の回数を制限する",
-        "誰が・いつ・何をしたかを記録し、後から追跡できるようにする",
-        "パスワードを暗号化して保存する",
-        "ログインできる時間帯を制限する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "AAA の3要素は、認証（Authentication：誰か）、認可（Authorization：何をしてよいか）、アカウンティング（Accounting：何をしたかの記録）。アカウンティングの記録は、障害調査や監査で操作の追跡に使われる。",
-      "id": "q418",
-      "stem": "AAA のアカウンティング（Accounting）の役割はどれか。",
-      "subtopic": "4.1 AAA のアカウンティング",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "TFTP より転送速度が速いため",
-        "設定ファイルを自動で世代管理できるため",
-        "SSH の暗号化通信の上で転送でき、平文で流れないため",
-        "追加のライセンスが不要なため"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "SFTP／SCP は SSH を土台にするため、認証情報もファイル内容も暗号化される。TFTP や FTP は平文で、盗聴や改ざんへの耐性がない。速度や世代管理はこの選択の理由ではない。",
-      "id": "q419",
-      "stem": "機器のファイル転送に SFTP／SCP を使う理由として正しいものはどれか。",
-      "subtopic": "4.2 安全なファイル転送の理由",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "VTY 回線に SSH のみを許可し、アクセス ACL を適用する",
-        "Telnet を許可し、パスワードを長くする",
-        "コンソールポートを常時開放する",
-        "enable パスワードを共有する"
-      ],
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "リモート管理は、平文の Telnet を止めて SSH のみにし、VTY に ACL をかけて接続元を絞るのが基本。パスワードの長さだけでは平文通信の盗聴は防げない。",
-      "id": "q420",
-      "stem": "機器へのリモート管理アクセスを安全にする設定として適切なものはどれか。",
-      "subtopic": "4.1 管理アクセスの保護",
-      "type": "single"
-    },
-    {
-      "domain": "services-security",
-      "examVersion": "v2.0",
-      "explanation": "AAA は、接続要求を受けて、認証で「誰か」を確認し、認可で「何をしてよいか」を判定し、実行した内容をアカウンティングで記録する流れ。認可は認証の結果を前提にするため、この順序は入れ替わらない。",
-      "id": "q421",
-      "items": [
-        "接続要求の受付",
-        "認証（本人確認）",
-        "認可（権限の判定）",
-        "アカウンティング（操作の記録）"
-      ],
-      "stem": "AAA によるアクセス制御の処理を、正しい順に並べ替えよ。",
-      "subtopic": "4.1 AAA の処理順序",
-      "type": "order"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "質問に文章で答えるだけの仕組み",
-        "目標を与えると、計画を立て、ツールを実行しながら複数ステップの作業を自律的に進める仕組み",
-        "ネットワーク機器のファームウェアの一種",
-        "ログを保管するためのファイル形式"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "エージェント型 AI は、単発の応答ではなく、目標に向けて計画→実行→結果の確認を繰り返し、ツールや API を使って作業を進める点が特徴。ネットワーク運用では、情報収集や切り分けの補助などへの活用が想定される。",
-      "id": "q501",
-      "stem": "エージェント型 AI（Agentic AI）の説明として正しいものはどれか。",
-      "subtopic": "5.1 エージェント型 AI の役割",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "出力してほしい文字数",
-        "その情報のデータ分類（外部の AI に送ってよい情報かどうか）",
-        "プロンプトの語尾の丁寧さ",
-        "回答をもらう言語"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "生成 AI へ送る前に、情報の機密区分を確認するのが先。構成情報や IP アドレス体系、顧客情報などは、組織のルール上送れない場合がある。プロンプトの工夫より先に「送ってよい情報か」を判断する。",
-      "id": "q502",
-      "stem": "社内ネットワークの構成情報を生成 AI に送って相談する前に、最初に確認すべきことはどれか。",
-      "subtopic": "5.2 プロンプトとデータ分類",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0,
-        1
-      ],
-      "choices": [
-        "目的と前提条件を明示する",
-        "出力形式（表・手順など）を指定する",
-        "社内の機密情報をそのまま全部貼り付ける",
-        "「なんとかして」とだけ書く"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "良いプロンプトは、目的・前提・出力形式・制約が明確。曖昧な依頼では期待した形の答えが返りにくい。機密情報をそのまま貼るのはデータ分類の観点から不適切。",
-      "id": "q503",
-      "stem": "ネットワーク運用の支援を生成 AI に依頼するプロンプトとして、適切な要素を2つ選べ。",
-      "subtopic": "5.2 プロンプトの構成要素",
-      "type": "multi"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "機器ごとに CLI で個別に設定する",
-        "中央のコントローラからポリシーを一括で配布・管理する",
-        "紙の台帳で設定変更を管理する",
-        "設定変更のたびに機器の再起動が必要になる"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "コントローラベースの管理では、ポリシーや設定をコントローラで集中管理し、配下の機器へ一括で反映する。機器ごとに CLI で入るのはデバイスベースの管理。",
-      "id": "q504",
-      "stem": "コントローラベースのネットワーク管理の特徴はどれか。",
-      "subtopic": "5.3 ネットワーク管理アプローチ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "構成をコード（宣言的な定義）で管理し、再現性のある自動構築を行う考え方",
-        "機器を手作業で設定するための手順書の書式",
-        "ケーブル配線の物理規格",
-        "障害発生時の電話連絡網"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "IaC（Infrastructure as Code）は、インフラの構成をコードで定義してバージョン管理し、同じ定義から同じ環境を何度でも再現できるようにする考え方。自動化ベースの管理の中核になる。",
-      "id": "q505",
-      "stem": "IaC（Infrastructure as Code）の説明として正しいものはどれか。",
-      "subtopic": "5.3 IaC（Infrastructure as Code）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "管理サーバが定期的に機器へ問い合わせる仕組み",
-        "機器がイベント発生時に管理サーバへ自発的に送る通知",
-        "構成ファイルを暗号化して運ぶトンネル",
-        "機器の構成を自動でバックアップする機能"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "トラップは、インターフェースのダウンなどのイベントが起きた瞬間に、機器側から管理サーバへ送られる通知。定期的な問い合わせはポーリング（get）と呼ばれ、両方を組み合わせて監視する。",
-      "id": "q506",
-      "stem": "SNMP のトラップとは何か。",
-      "subtopic": "5.4 SNMP（トラップ）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "通信の高速化",
-        "認証と暗号化によるセキュリティの強化",
-        "自動配線機能",
-        "IPv6 専用プロトコルへの移行"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "SNMPv1／v2c はコミュニティ名が平文で流れるなどセキュリティが弱かった。v3 ではユーザ認証と暗号化が導入され、安全に監視情報をやり取りできるようになった。",
-      "id": "q507",
-      "stem": "SNMPv3 で、以前のバージョンから強化された点はどれか。",
-      "subtopic": "5.4 SNMPv3",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "管理対象に専用エージェントを常駐させる必要がある",
-        "エージェントレスで、SSH 経由で対象機器にコマンドを実行する",
-        "Windows 専用のツールである",
-        "GUI でのみ操作できる"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "Ansible は管理対象にエージェントを入れず、SSH（Windows なら WinRM）経由で接続してコマンドや設定を実行する。手順はプレイブックとして YAML で記述する。",
-      "id": "q508",
-      "stem": "構成管理ツール Ansible の特徴として正しいものはどれか。",
-      "subtopic": "5.5 Ansible による構成管理",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "0〜7 の範囲で、数値が小さいほど重大",
-        "0〜7 の範囲で、数値が大きいほど重大",
-        "1〜10 の範囲で、数値が小さいほど重大",
-        "重大度は数値では表さない"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "syslog の重大度は 0（Emergency：最も重大）から 7（Debug：デバッグ情報）。「小さいほど重大」が読み取りの基本で、運用では一定以上の重大度だけを通知対象にすることが多い。",
-      "id": "q509",
-      "stem": "syslog の重大度（severity）レベルについて正しいものはどれか。",
-      "subtopic": "5.6 syslog の重大度",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "重大度3（エラー）のメッセージで、Gi0/1 がダウンしたことを示す",
-        "3回目の再起動が発生したことを示す",
-        "3分後に自動復旧する予告を示す",
-        "ポート番号3の異常を示す"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "syslog メッセージは「%ファシリティ-重大度-ニーモニック」の形式。LINK はリンク関係、3 は重大度（エラー）、UPDOWN は状態変化を表すニーモニック。本文と合わせて「Gi0/1 がダウンした」と読む。",
-      "id": "q510",
-      "stem": "syslog メッセージ「%LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down」の解釈として正しいものはどれか。",
-      "subtopic": "5.6 syslog メッセージの解釈",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "管理サーバが定期的に機器へ問い合わせて情報を取得する",
-        "機器がイベント時に自発的に通知する",
-        "管理サーバが設定ファイルを配布する",
-        "機器同士が経路情報を交換する"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "ポーリングは、管理サーバが一定間隔で get を送って機器の状態を取得する方式。イベント発生時に機器から送られる通知はトラップで、両者を組み合わせて監視するのが一般的。",
-      "id": "q511",
-      "stem": "SNMP のポーリングとは何か。",
-      "subtopic": "5.4 SNMP（ポーリング）",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "メッセージの発生源の種別（カーネル、認証、メールなど）",
-        "メッセージの重大度",
-        "メッセージの宛先サーバ",
-        "メッセージの時刻精度"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "ファシリティは「どの機能・発生源からのメッセージか」を表す分類で、重大度（severity）とは別の軸。両方を組み合わせて、たとえば「認証系の、重大度4以上だけを通知する」といった振り分けができる。",
-      "id": "q512",
-      "stem": "syslog のファシリティ（facility）が表すものはどれか。",
-      "subtopic": "5.6 syslog のファシリティ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "機器ごとに現地で作業して管理する",
-        "ベンダのクラウド上の管理基盤から、インターネット経由で多数の機器を一元管理する",
-        "オフライン環境でのみ使える",
-        "紙の台帳と組み合わせることが必須である"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "クラウドベースの管理は、管理基盤がベンダのクラウドにあり、拠点の機器をインターネット経由で一元管理する方式。新拠点の追加や可視化がしやすい反面、インターネット接続が前提になる。",
-      "id": "q513",
-      "stem": "クラウドベースのネットワーク管理の特徴はどれか。",
-      "subtopic": "5.3 クラウドベース管理",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "回答させる役割や立場を定め、回答の観点や深さを寄せる",
-        "送る情報の機密区分を表す",
-        "出力の文字数を固定する",
-        "通信を暗号化する"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "ペルソナは「ベテランのネットワークエンジニアとして答えて」のように役割を指定する要素。回答の専門性や観点がその役割に寄る。機密区分はデータ分類、出力の形は出力形式の指定が担う、別の要素。",
-      "id": "q514",
-      "stem": "生成 AI へのプロンプトで「ペルソナ（役割）」を指定する目的はどれか。",
-      "subtopic": "5.2 プロンプトのペルソナ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "YAML",
-        "バイナリ形式",
-        "ベンダ独自の暗号化形式",
-        "画像ファイル"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "Ansible のプレイブックは YAML で記述し、対象機器はインベントリで指定する。人間にも読みやすいテキスト形式のため、バージョン管理と組み合わせて構成変更の履歴を残せる。",
-      "id": "q515",
-      "stem": "Ansible のプレイブックが記述される形式はどれか。",
-      "subtopic": "5.5 Ansible のプレイブック",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "対象機器の IP アドレスの一覧",
-        "管理対象の機器やグループを定義したファイル",
-        "プレイブックの実行結果の要約",
-        "暗号鍵の保管場所"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "インベントリは、Ansible が操作する対象ホストやグループを定義したもの。プレイブック（手順）とインベントリ（対象）が分かれているため、同じ手順を別拠点の機器群にも使い回せる。",
-      "id": "q521",
-      "stem": "Ansible のインベントリとは何か。",
-      "subtopic": "5.5 Ansible のインベントリ",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "機器の台数を減らせる",
-        "設定ファイルを自動で圧縮できる",
-        "手順をコード化して繰り返し実行でき、人手作業のミスやばらつきを減らせる",
-        "ベンダのサポート契約が不要になる"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "自動化の価値は、同じ手順を何度でも同じ品質で実行できること。手作業の入力ミスや設定のばらつきが減り、変更履歴もコードとして残る。台数や契約の話ではない。",
-      "id": "q522",
-      "stem": "ネットワーク運用を自動化する利点として最も適切なものはどれか。",
-      "subtopic": "5.3 自動化ベースの管理",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "機器の状態を表す項目（OID で識別される管理情報）の集まり",
-        "ログファイルを圧縮した形式",
-        "ルーティングテーブルの別名",
-        "ファームウェアの版数表"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "MIB は、SNMP で監視できる項目（インターフェースの流量、カウンタ、状態など）を OID という識別子で体系化したもの。監視サーバは OID を指定して値を取得する。",
-      "id": "q523",
-      "stem": "SNMP の MIB とは何か。",
-      "subtopic": "5.4 SNMP の MIB",
-      "type": "single"
-    },
-    {
-      "answer": [
-        1
-      ],
-      "choices": [
-        "そのまま本番手順として即座に実行する",
-        "事実確認と検証を行い、根拠を確認してから使う",
-        "文字数が多いほど正しいと判断する",
-        "出典を尋ねても意味がないので聞かない"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "生成 AI は、もっともらしいが誤った内容（ハルシネーション）を返すことがある。運用の判断に使う前に、公式ドキュメントや実機の出力で裏付けるのが前提。効率化の道具であって、検証の省略にはならない。",
-      "id": "q524",
-      "stem": "生成 AI の回答をネットワーク運用の判断に使う際の注意点として正しいものはどれか。",
-      "subtopic": "5.1／5.2 AI 回答の検証",
-      "type": "single"
-    },
-    {
-      "answer": [
-        2
-      ],
-      "choices": [
-        "重大度 5 はデバッグ情報を表す",
-        "CONFIG_I はルーティングの収束を示す",
-        "重大度 5（通知）で、設定変更が行われたことを記録するメッセージ",
-        "重大度 5 は最も重大な障害を表す"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "%SYS-5-CONFIG_I は、SYS ファシリティ、重大度 5（notification：通常だが有意な状態）、ニーモニック CONFIG_I で、「設定が変更された」という記録。障害ではなく、変更履歴の追跡に使うメッセージ。",
-      "id": "q525",
-      "stem": "syslog メッセージ「%SYS-5-CONFIG_I: Configured from console by admin」の解釈として正しいものはどれか。",
-      "subtopic": "5.6 syslog メッセージの解釈",
-      "type": "single"
-    },
-    {
-      "answer": [
-        0
-      ],
-      "choices": [
-        "機器が NTP で時刻同期していること",
-        "機器のホスト名が一意であること",
-        "syslog の重大度を 0 に固定すること",
-        "ログをローカルに保存しないこと"
-      ],
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "複数機器のログを突き合わせて時系列を追うには、各機器の時刻がそろっていることが前提になる。時刻がずれると、障害の前後関係を誤読する。NTP による同期はログ運用の土台。",
-      "id": "q526",
-      "stem": "複数機器の syslog を突き合わせて障害調査をするために重要な前提はどれか。",
-      "subtopic": "5.6 ログの時刻同期",
-      "type": "single"
-    },
-    {
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "syslog の重大度は数値が小さいほど重大で、0 の Emergency（システム使用不可）から始まる。ログのフィルタリングでは「指定した数値以下の重大度」が対象になるため、この序列が前提になる。",
-      "id": "q527",
-      "items": [
-        "Emergency（0）",
-        "Alert（1）",
-        "Critical（2）",
-        "Error（3）",
-        "Warning（4）"
-      ],
-      "stem": "syslog の重大度を、重大なものから順に並べ替えよ。",
-      "subtopic": "5.6 syslog 重大度の序列",
-      "type": "order"
-    },
-    {
-      "domain": "ai-ops",
-      "examVersion": "v2.0",
-      "explanation": "障害対応は、まず検知して切り分け、原因が分からなくても暫定対処で止血（復旧）を優先し、その後に原因を特定して恒久対策を打ち、最後に記録して共有する流れ。恒久対策を急ぐあまり復旧が遅れるのは本末転倒になる。",
-      "id": "q528",
-      "items": [
-        "検知",
-        "切り分け",
-        "暫定対処（止血）",
-        "原因の特定と恒久対策",
-        "記録と共有"
-      ],
-      "stem": "障害対応の基本的な流れを、正しい順に並べ替えよ。",
-      "subtopic": "5.6 障害対応の流れ",
-      "type": "order"
-    }
-  ]
+ "domains": [
+  {
+   "id": "infra",
+   "name": "1.0 Network Infrastructure and Connectivity",
+   "weight": 25
+  },
+  {
+   "id": "switching",
+   "name": "2.0 Switching and Network Access",
+   "weight": 25
+  },
+  {
+   "id": "routing",
+   "name": "3.0 IP Routing",
+   "weight": 20
+  },
+  {
+   "id": "services-security",
+   "name": "4.0 Network Services and Security",
+   "weight": 20
+  },
+  {
+   "id": "ai-ops",
+   "name": "5.0 AI, and Network Operations and Management",
+   "weight": 10
+  }
+ ],
+ "examVersion": "v2.0",
+ "questions": [
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "ケーブルの断線",
+    "duplex（デュプレックス）のミスマッチ",
+    "IP アドレスの重複",
+    "STP のループ"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "片側が全二重、片側が半二重で動作すると、半二重側では遅延コリジョン（late collision）、全二重側では FCS／CRC エラーが増え、通信できても極端に遅くなる。show interfaces のカウンタと両端の duplex 設定を突き合わせるのが切り分けの基本。",
+   "id": "q101",
+   "stem": "スイッチとルータを接続したリンクで、通信はできるが極端に遅い。半二重で動作している側では late collision（遅延コリジョン）が、全二重側では FCS エラーが増加している。最も可能性が高い原因はどれか。",
+   "subtopic": "1.1 インターフェース／ケーブル障害の診断",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "マルチモードファイバ",
+    "シングルモードファイバ",
+    "カテゴリ5e UTP ケーブル",
+    "同軸ケーブル"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "シングルモードファイバはコア径が細く、長距離伝送に向く（数km〜）。マルチモードは構内などの短距離向け、UTP は 100m が上限。距離と信号減衰の観点から媒体を選ぶのが 1.1 の要点。",
+   "id": "q102",
+   "stem": "1.5km 離れた2つの建物の間を光ファイバで接続する。最も適した媒体はどれか。",
+   "subtopic": "1.1 ケーブル種別と距離",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "タイプ1（ベアメタル型）",
+    "タイプ2（ホスト型）",
+    "コンテナランタイム",
+    "ターミナルエミュレータ"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "タイプ1ハイパーバイザはハードウェア上で直接動作し、間にホスト OS を挟まないため、サーバ仮想化の基盤として使われる。タイプ2は既存の OS 上でアプリケーションとして動作する。",
+   "id": "q103",
+   "stem": "ハイパーバイザのうち、ホスト OS を介さずハードウェア上で直接動作するものはどれか。",
+   "subtopic": "1.2 ハイパーバイザの種類",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "各コンテナが専用のゲスト OS とカーネルを持つ",
+    "ホスト OS のカーネルを共有し、ゲスト OS を持たないため軽量で起動が速い",
+    "動作には必ずハイパーバイザが必要である",
+    "仮想マシンより消費リソースが大きい"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "コンテナはホスト OS のカーネルを共有し、プロセスとして隔離される。そのためゲスト OS 分のオーバーヘッドがなく、軽量で起動も速い。仮想マシンは台ごとにゲスト OS を持ち、より強い隔離が得られる。",
+   "id": "q104",
+   "stem": "仮想マシンと比較したコンテナの特徴として正しいものはどれか。",
+   "subtopic": "1.2 コンテナと仮想マシン",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "192.168.1.0",
+    "192.168.1.64",
+    "192.168.1.70",
+    "192.168.1.128"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "/26 のブロックサイズは 64。ネットワークは .0、.64、.128、.192 と区切られるため、.70 が属するネットワークは .64。ブロードキャストは .127、使用可能範囲は .65〜.126。",
+   "id": "q105",
+   "stem": "ホスト 192.168.1.70/26 が属するネットワークアドレスはどれか。",
+   "subtopic": "1.3 IPv4 サブネット計算",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "DNS サーバに到達できないため",
+    "デフォルトゲートウェイが自サブネットの範囲外にあるため",
+    "DHCP サーバが停止しているため",
+    "ケーブルがクロス結線になっているため"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "/25 では 192.168.1.128/25 の使用可能範囲は .129〜.254。ゲートウェイの 192.168.1.1 は反対側のサブネット（.0/25）に属するため、PC はゲートウェイ自体に到達できない。ゲートウェイは必ず自サブネット内に置く。",
+   "id": "q106",
+   "stem": "PC に 192.168.1.130/25 を設定し、デフォルトゲートウェイを 192.168.1.1 としたが、他のネットワークへ通信できない。原因はどれか。",
+   "subtopic": "1.3 IPv4 設定のトラブルシュート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "2001:db8::ff00:42:8329",
+    "2001:db8::ff00::42:8329",
+    "2001:db8::ff00:42:83290",
+    "2001:db8::ff00:42:832"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "「::」によるゼロ圧縮は1つのアドレスで1回だけ使える。B は2回使っているため不正。C は最終グループが5桁で不正。D は末尾が 832 になっており、元の 8329 と値が異なるため別アドレスになる。正解の A は先行ゼロの省略と1回の「::」圧縮を正しく使っている。",
+   "id": "q107",
+   "stem": "IPv6 アドレス 2001:0db8:0000:0000:0000:ff00:0042:8329 の省略表記として正しいものはどれか。",
+   "subtopic": "1.4 IPv6 アドレス表記",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "1、2、3",
+    "1、6、11",
+    "5、7、9",
+    "11、12、13"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "2.4GHz 帯のチャネルは互いに重なっており、干渉を避けて同時に使える組み合わせは 1、6、11。隣接チャネル同士は部分的に重なるため、近くの AP とはこの3つの範囲で割り当てる。",
+   "id": "q108",
+   "stem": "2.4GHz 帯の無線 LAN で、互いに干渉しないチャネルの組み合わせはどれか。",
+   "subtopic": "1.5 無線の原理（チャネル選択）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "ipconfig /all",
+    "ping -t",
+    "tracert",
+    "netstat -a"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "ipconfig /all で IP アドレス、サブネットマスク、デフォルトゲートウェイに加え、DNS サーバや DHCP の情報までまとめて確認できる。クライアント接続の切り分けでは、まず IP 設定の確認から始める。",
+   "id": "q109",
+   "stem": "Windows クライアントで、IP アドレス・サブネットマスク・デフォルトゲートウェイ・DNS サーバをまとめて確認するコマンドはどれか。",
+   "subtopic": "1.6 クライアント接続の確認",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "ip helper-address（DHCP サーバのアドレス）",
+    "ip dhcp pool の作成",
+    "spanning-tree portfast",
+    "switchport mode trunk"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "169.254.x.x は APIPA（リンクローカル）のアドレスで、DHCP でアドレスを取得できなかったサイン。DHCP の要求はブロードキャストのため別サブネットのサーバには届かない。ゲートウェイ（SVI）に ip helper-address を設定すると、要求がユニキャストでサーバへ中継される（DHCP リレー）。",
+   "id": "q110",
+   "stem": "ある VLAN のクライアントが 169.254.x.x のアドレスしか取得できない。DHCP サーバは別のサブネットにあり、クライアントのゲートウェイである SVI には中継の設定がない。SVI に必要な設定はどれか。",
+   "subtopic": "1.7 DHCPv4 リレーのトラブルシュート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "021A:2BFF:FE3C:4D5E",
+    "001A:2BFF:FE3C:4D5E",
+    "021A:2B3C:FFFE:4D5E",
+    "021A:2BFF:FF3C:4D5E"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "EUI-64 では MAC アドレスの中央に FFFE を挿入し、先頭バイトの U/L ビット（第7ビット）を反転させる。00 の第7ビットを反転すると 02 になるため、021A:2BFF:FE3C:4D5E が正しい。",
+   "id": "q111",
+   "stem": "MAC アドレス 00:1A:2B:3C:4D:5E から EUI-64 形式で生成されるインターフェース ID はどれか。",
+   "subtopic": "1.4 IPv6（EUI-64）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "WEP より通信速度が速い",
+    "SAE（同時認証）により、パスワード認証がオフラインの辞書攻撃に強くなった",
+    "暗号化を省略して接続を高速化する",
+    "2.4GHz 帯でのみ使える"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "WPA3 の個人向けモードは SAE（Simultaneous Authentication of Equals）を採用し、キャプチャした handshake からパスワードを試すオフライン辞書攻撃が成立しにくくなった。暗号化そのものを省くわけではない。",
+   "id": "q112",
+   "stem": "無線 LAN のセキュリティ規格 WPA3（パーソナル）の改善点として正しいものはどれか。",
+   "subtopic": "1.5 無線のセキュリティ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "電子レンジと Bluetooth 機器",
+    "光ファイバケーブルの曲げ",
+    "有線 LAN のスイッチングハブ",
+    "GPS 衛星の電波"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "電子レンジや Bluetooth は 2.4GHz 帯を使うため、同じ帯域の無線 LAN と干渉する。無線が不安定なときは、チャネルの混雑だけでなく、こうした帯域を共有する機器の存在も疑う。",
+   "id": "q113",
+   "stem": "2.4GHz 帯の無線 LAN で電波干渉の原因になりうるものはどれか。",
+   "subtopic": "1.5 無線の干渉要因",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "172.32.0.1",
+    "172.16.5.4",
+    "192.169.0.1",
+    "11.0.0.1"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "プライベートアドレスは 10.0.0.0/8、172.16.0.0/12（172.16〜172.31）、192.168.0.0/16 の3範囲。172.32 は範囲の外でパブリックアドレス。192.169 は 192.168 ではない点にも注意。",
+   "id": "q114",
+   "stem": "プライベート IPv4 アドレスに該当するものはどれか。",
+   "subtopic": "1.3 プライベートアドレス",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "アドレスプールの枯渇",
+    "DHCP リレーの設定漏れ",
+    "DNS サーバの障害",
+    "端末のケーブル断線"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "リレーの不備なら VLAN 全端末が影響を受ける。既存端末が正常で新規だけ取れず、プールに空きがないのなら、リース可能なアドレスが尽きたプール枯渇。リース期間の短縮やプール拡張が対処になる。",
+   "id": "q115",
+   "stem": "既存の端末は正常に IP アドレスを保持しているのに、新しく接続した端末だけがアドレスを取得できない。DHCP サーバのプール使用率は 100% だった。原因はどれか。",
+   "subtopic": "1.7 DHCP サーバのトラブルシュート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "ポート番号の割り振り",
+    "コネクタの汚れや損傷による光信号の減衰",
+    "IP アドレスの設定",
+    "VLAN の割り当て"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "光ファイバはコネクタ端面の汚れや傷で受信レベルが下がり、エラーやリンクダウンの原因になる。インターフェース／ケーブル診断（1.1）では、信号レベルと物理状態の確認が基本になる。",
+   "id": "q116",
+   "stem": "光ファイバ接続で、リンクが不安定になったり受信エラーが増えたりする物理的な原因として典型的なものはどれか。",
+   "subtopic": "1.1 光ファイバの信号とコネクタ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "192.168.1.0",
+    "192.168.1.64",
+    "192.168.1.127",
+    "192.168.1.255"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "/26 のブロックは 64 刻み。.64 のネットワークは .64〜.127 で、末尾の .127 がブロードキャストアドレス。ネットワークアドレス（.64）と対で覚える。",
+   "id": "q117",
+   "stem": "ネットワーク 192.168.1.64/26 のブロードキャストアドレスはどれか。",
+   "subtopic": "1.3 ブロードキャストアドレスの計算",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "Discover → Offer → Request → Ack",
+    "Offer → Discover → Ack → Request",
+    "Request → Discover → Offer → Ack",
+    "Ack → Offer → Request → Discover"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "DHCPv4 のアドレス取得は DORA の順：クライアントの Discover、サーバの Offer、クライアントの Request、サーバの Ack。途中で止まる段階を見れば、リレー・サーバ・応答のどこで詰まっているか切り分けられる。",
+   "id": "q118",
+   "stem": "DHCPv4 でアドレスを取得する際のメッセージの順序として正しいものはどれか。",
+   "subtopic": "1.7 DHCP の動作（DORA）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "2.4GHz より到達距離が長い",
+    "使えるチャネル数が多く、干渉を受けにくい",
+    "障害物を回り込む性質が強い",
+    "古い端末との互換性が高い"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "5GHz 帯はチャネル数が多く混雑しにくい反面、直進性が強く、壁などの障害物で減衰しやすいため到達距離は短め。2.4GHz は遠くまで届くが干渉源も多い。帯域の使い分けはこの特性で判断する。",
+   "id": "q119",
+   "stem": "5GHz 帯の無線 LAN の特徴として正しいものはどれか。",
+   "subtopic": "1.5 無線の帯域特性",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "デフォルトゲートウェイの誤り",
+    "DHCP サーバの停止",
+    "DNS サーバの設定誤り",
+    "無線の電波強度不足"
+   ],
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "IP アドレスでの通信（ping）ができて名前でだけ失敗するのは、名前解決の問題。ゲートウェイや回線が壊れていれば IP でも通らない。クライアントの DNS 設定を確認する。",
+   "id": "q120",
+   "stem": "クライアントからサーバへ IP アドレスでは ping が通るのに、ホスト名ではアクセスできない。疑うべき設定はどれか。",
+   "subtopic": "1.6 クライアント接続（名前解決）",
+   "type": "single"
+  },
+  {
+   "domain": "infra",
+   "examVersion": "v2.0",
+   "explanation": "スイッチの起動は、POST でハードウェアを診断し、ブートローダが IOS イメージを読み込んで起動し、最後に startup-config が running-config として適用される順序。起動の途中で止まる段階を見れば、ハードウェアかソフトウェアか設定かを切り分けられる。",
+   "id": "q121",
+   "items": [
+    "POST（電源投入時の自己診断）",
+    "ブートローダの実行",
+    "IOS イメージの読み込み",
+    "startup-config の適用"
+   ],
+   "stem": "スイッチの起動手順を、正しい順に並べ替えよ。",
+   "subtopic": "1.2 スイッチの起動順序",
+   "type": "order"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "リンクが即座にダウンし、トランクは形成されない",
+    "CDP がミスマッチを警告し、タグなしフレームが相手側の想定外の VLAN に届く恐れがある",
+    "自動的に小さい方の VLAN 番号に統一される",
+    "DTP により両端ともアクセスポートに変わる"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "ネイティブ VLAN が両端で異なると、CDP が Native VLAN mismatch を警告する。タグなしフレームは受信側のネイティブ VLAN で処理されるため、意図しない VLAN へフレームが漏れる（VLAN リーク）恐れがあり、セキュリティ上も問題になる。両端で一致させるのが原則。",
+   "id": "q201",
+   "stem": "2台のスイッチ間トランクで、両端のネイティブ VLAN が異なる設定になっている。起こりうる事象はどれか。",
+   "subtopic": "2.1 トランクとネイティブ VLAN",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "両端とも passive",
+    "片側 active、片側 passive",
+    "片側 on、片側 passive",
+    "両端とも auto"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "LACP では少なくとも一方が active でないと交渉が始まらないため、passive 同士ではチャネルは形成されない。on は LACP を使わず無条件に束ねるモードで、LACP のモードではない。auto は PAgP 側のモード名。",
+   "id": "q202",
+   "stem": "LACP で EtherChannel を形成できるモードの組み合わせはどれか。",
+   "subtopic": "2.1 EtherChannel（LACP）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "物理インターフェースを束ねるための仮想インターフェース",
+    "VLAN ごとの論理的なレイヤ3インターフェースで、その VLAN のホストのゲートウェイになる",
+    "コンソール接続専用の管理インターフェース",
+    "STP のルートブリッジを示す識別子"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "SVI（Switch Virtual Interface）は VLAN に対応する L3 インターフェース。マルチレイヤスイッチでは、SVI に IP アドレスを設定するとその VLAN のホストのデフォルトゲートウェイとして動作し、VLAN 間ルーティングが可能になる。",
+   "id": "q203",
+   "stem": "SVI（Switch Virtual Interface）の説明として正しいものはどれか。",
+   "subtopic": "2.1 SVI",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "Ethernet ケーブル経由で、アクセスポイントや IP 電話へデータと電力を一緒に供給できる",
+    "2本のケーブルで帯域を2倍にできる",
+    "通信を暗号化して盗聴を防げる",
+    "1つのポートで複数の VLAN を扱える"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "PoE（Power over Ethernet）は、データ通信に使う Ethernet ケーブルで電力も供給する仕組み。電源の取りにくい場所のアクセスポイントや IP 電話、天井のカメラなどを、電源工事なしに設置できる。",
+   "id": "q204",
+   "stem": "PoE（Power over Ethernet）の説明として正しいものはどれか。",
+   "subtopic": "2.2 PoE",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "そのポートをトランクポートに設定する",
+    "アクセスポートにデータ用 VLAN と音声 VLAN の両方を設定する",
+    "電話と PC それぞれに物理ポートを分けなければ構成できない",
+    "電話とスイッチの間で EtherChannel を組む"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "IP 電話は音声を音声 VLAN、背後の PC の通信をデータ VLAN に分けて中継する。スイッチ側はアクセスポートのまま、音声 VLAN を併せて設定するのが標準的な構成で、ポートをトランク化する必要はない。",
+   "id": "q205",
+   "stem": "1つのスイッチポートに IP 電話を接続し、電話の背後に PC をつなぐ。音声とデータを別 VLAN に分けるためのスイッチ側の設定はどれか。",
+   "subtopic": "2.2 音声 VLAN（エッジポート属性）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "show cdp neighbors detail",
+    "show vlan brief",
+    "show ip route",
+    "show spanning-tree"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "CDP は隣接する Cisco 機器の機器名、接続ポート、IP アドレスなどを教えてくれるため、実際の配線と構成図の突き合わせに使える。ベンダー混在環境では LLDP（show lldp neighbors）を使う。",
+   "id": "q206",
+   "stem": "構成図（ネットワークドキュメント）の正確性を検証するため、実際に接続されている隣接機器とそのポートを確認したい。適したコマンドはどれか。",
+   "subtopic": "2.3 CDP／LLDP によるドキュメント検証",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "通常の ping",
+    "拡張 ping",
+    "traceroute",
+    "show interfaces"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "拡張 ping では送信元アドレス／インターフェース、パケットサイズ、回数などを指定できる。特定の送信元からでないと再現しない到達性の問題を切り分けるのに使う。traceroute は経路の確認が主目的。",
+   "id": "q207",
+   "stem": "到達性の切り分けで、送信元インターフェースを指定して疎通を確認したい。適した手段はどれか。",
+   "subtopic": "2.4 切り分けツール（拡張 ping）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "ポート番号が最も小さいポート",
+    "ルートブリッジへの累積コストが最小になるポート",
+    "常にブロッキング状態になるポート",
+    "DR に選ばれたポート"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "ルートポートは、非ルートスイッチごとに1つ選ばれる「ルートブリッジへの最短路」のポート。受信した BPDU のパスコストを比較して決まる。DR は OSPF の用語で STP にはない。",
+   "id": "q208",
+   "stem": "Rapid PVST+ におけるルートポートの説明として正しいものはどれか。",
+   "subtopic": "2.5 Rapid PVST+（ルートポート）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "MAC アドレスが最も大きいスイッチ",
+    "ブリッジ ID が最も小さいスイッチ",
+    "ポート数が最も多いスイッチ",
+    "最初に起動したスイッチ"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "ルートブリッジはブリッジ ID（ブリッジプライオリティ＋MAC アドレス）の比較で決まり、最も小さいものが選ばれる。プライオリティが同点なら MAC アドレスの小さい方。意図したスイッチをルートにするにはプライオリティを下げる設定を行う。",
+   "id": "q209",
+   "stem": "Rapid PVST+ でルートブリッジに選ばれるのはどのようなスイッチか。",
+   "subtopic": "2.5 Rapid PVST+（ルートブリッジ選出）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0,
+    1
+   ],
+   "choices": [
+    "PortFast はエッジポートを即座にフォワーディング状態へ遷移させる",
+    "BPDU ガードは、PortFast 有効ポートが BPDU を受信するとそのポートを err-disable 状態にする",
+    "PortFast はスイッチ間リンクに設定することが推奨される",
+    "BPDU ガードは、受信した BPDU を破棄して通信を継続させる"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "PortFast は端末向けのエッジポートで、STP の待機を省いて即座に転送状態にする機能。スイッチ間リンクに使うものではない。BPDU ガードは、そのポートにスイッチが誤接続されて BPDU が届いた場合に、ループを防ぐためポートを err-disable（無効化）する。BPDU を破棄して継続するのではない。",
+   "id": "q210",
+   "stem": "PortFast と BPDU ガードについて、正しいものを2つ選べ。",
+   "subtopic": "2.5 PortFast と BPDU ガード",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "switchport trunk allowed vlan に VLAN 30 が含まれていない",
+    "ネイティブ VLAN の不一致",
+    "STP でポートがブロッキングされている",
+    "DTP のネゴシエーション失敗"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "allowed vlan で許可されていない VLAN のフレームはトランクを通過できない。ネイティブ VLAN の不一致が影響するのはネイティブ VLAN（この場合は VLAN 1）だけ。トランク自体は他の VLAN が通っている時点で形成されている。",
+   "id": "q211",
+   "stem": "トランクポートで VLAN 10 と VLAN 20 は通信できるのに、VLAN 30 だけが対向スイッチへ届かない。トランクの設定を確認すべき点はどれか。",
+   "subtopic": "2.1 トランクの allowed VLAN",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "スイッチのホスト名",
+    "ポート番号が連番であること",
+    "speed・duplex・VLAN などの設定がメンバー全ポートで一致していること",
+    "ケーブルの色がそろっていること"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "EtherChannel は、束ねるポートの設定（speed、duplex、アクセス／トランクと許可 VLAN など）がそろっていないと形成されない、またはメンバーから外される。物理的な近さや番号は要件ではない。",
+   "id": "q212",
+   "stem": "EtherChannel を形成するために、メンバーポート間で一致させなければならないものはどれか。",
+   "subtopic": "2.1 EtherChannel の要件",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "Cisco 独自のプロトコルで、同社製品同士でしか使えない",
+    "IEEE の標準規格で、ベンダが異なる機器同士でも隣接情報を確認できる",
+    "ルーティングプロトコルの一種である",
+    "通信を暗号化するためのプロトコルである"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "LLDP は IEEE 802.1AB の標準規格でベンダ中立。Cisco 独自の CDP と違い、混在環境でも隣接確認に使える。どちらも構成ドキュメントの検証に用いる発見プロトコルで、ルーティングや暗号化は行わない。",
+   "id": "q213",
+   "stem": "LLDP の説明として正しいものはどれか。",
+   "subtopic": "2.3 LLDP",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "セグメントごとに選ばれ、ルートブリッジへの最短路側でフレームを転送するポート",
+    "常にブロッキング状態になるポート",
+    "エンドデバイスを接続するためのポート",
+    "コンソール接続に使う管理ポート"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "指定ポートは、セグメントごとに「ルートブリッジに最も近いスイッチ」のポートが選ばれ、そのセグメントのフレームをルート方向へ転送する。ルートポートが「自スイッチの出口」なら、指定ポートは「セグメント側の入口」にあたる。",
+   "id": "q214",
+   "stem": "Rapid PVST+ における指定ポート（designated port）の説明として正しいものはどれか。",
+   "subtopic": "2.5 Rapid PVST+（指定ポート）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "機器内部の温度やファンの状態",
+    "実際に流れているフレームの送信元・宛先やプロトコルの中身",
+    "将来発生する障害の予測",
+    "設定ミスの自動修正"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "パケットキャプチャは、線の上を実際に流れるフレームそのものを見る手段。「設定上は送っているはず」と「実際に届いている」が食い違うときの切り分けに使う。機器の状態確認には show コマンド類を使う。",
+   "id": "q215",
+   "stem": "トラブルシュートでパケットキャプチャの出力を読むと分かることはどれか。",
+   "subtopic": "2.4 パケットキャプチャ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "1〜255",
+    "1〜1005",
+    "1024〜4094",
+    "制限はない"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "通常範囲（normal range）は 1〜1005 で、この範囲は VLAN データベースに保存される標準的な VLAN。1006〜4094 は拡張範囲（extended range）。",
+   "id": "q216",
+   "stem": "VLAN の通常範囲（normal range）はどれか。",
+   "subtopic": "2.2 VLAN の範囲",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0,
+    2
+   ],
+   "choices": [
+    "接続している機器の IP アドレス",
+    "スイッチの内部温度",
+    "そのポートの接続先機器の機種やポート番号",
+    "スイッチの消費電力"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "CDP では隣接機器のデバイス名、接続ポート、IP アドレス、機種や IOS のバージョンなどが分かる。温度や消費電力のような環境情報は CDP の対象ではない。",
+   "id": "q217",
+   "stem": "CDP で確認できる情報を2つ選べ。",
+   "subtopic": "2.3 CDP で得られる情報",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "5つ（Initial、Blocking、Listening、Learning、Forwarding）",
+    "3つ（Discarding、Learning、Forwarding）",
+    "2つ（Blocking、Forwarding）",
+    "4つ（Blocking、Listening、Disabled、Forwarding）"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "Rapid PVST+（RSTP 系）は状態を Discarding／Learning／Forwarding の3つに整理した。従来 STP の Blocking と Listening が Discarding に統合され、収束が速くなった。",
+   "id": "q218",
+   "stem": "Rapid PVST+ のポート状態の組み合わせとして正しいものはどれか。",
+   "subtopic": "2.5 Rapid PVST+ のポート状態",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "スイッチの電源が入っていること",
+    "管理者権限でログインしていること",
+    "対象 VLAN が存在し、その VLAN でアクティブなポートがあること",
+    "STP が無効化されていること"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "SVI は、対応する VLAN が作成されていて、その VLAN に属するポート（アクセスまたはトランク）がリンクアップしていないと up/up にならない。SVI が down のままのときは、この条件を順に確認する。",
+   "id": "q219",
+   "stem": "SVI が up/up になるために必要な条件はどれか。",
+   "subtopic": "2.1 SVI の up 条件",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "802.3af（PoE）と 802.3at（PoE+）",
+    "802.1Q と 802.1D",
+    "802.11a と 802.11b",
+    "802.3u と 802.3z"
+   ],
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "PoE の規格は 802.3af（最大 15.4W）と 802.3at（PoE+、最大 30W）。接続する機器（AP、IP 電話、カメラ）の消費電力に合う規格のポートを用意する。802.1Q はトランク、802.11 系は無線 LAN の規格。",
+   "id": "q220",
+   "stem": "PoE の規格として正しい組み合わせはどれか。",
+   "subtopic": "2.2 PoE の規格",
+   "type": "single"
+  },
+  {
+   "domain": "switching",
+   "examVersion": "v2.0",
+   "explanation": "STP の収束は、まずルートブリッジを1台決め、次に各スイッチがルートへの出口（ルートポート）を決め、各セグメントの代表（指定ポート）が決まり、残ったポートがブロッキングになってループを断つ順序で進む。",
+   "id": "q221",
+   "items": [
+    "ルートブリッジの選出",
+    "各スイッチのルートポート決定",
+    "各セグメントの指定ポート決定",
+    "不要なポートをブロッキング"
+   ],
+   "stem": "STP が収束するまでの流れを、正しい順に並べ替えよ。",
+   "subtopic": "2.5 STP の収束手順",
+   "type": "order"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "192.168.1.1",
+    "192.168.2.1",
+    "192.168.3.1",
+    "メトリックが最小の 192.168.1.1 と 192.168.3.1 の両方"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "ルータはまず最長一致（longest match）で経路を選ぶ。宛先 10.1.2.5 に一致する中で最もプレフィックスが長いのは 10.1.2.0/24 なので、ネクストホップは 192.168.3.1。メトリックや AD は、同じプレフィックスの経路が複数ある場合に初めて比較される。",
+   "id": "q001",
+   "stem": "ルータのルーティングテーブルに次のエントリがある。宛先 10.1.2.5 へのパケットはどのネクストホップへ転送されるか。\nO 10.0.0.0/8 [110/2] via 192.168.1.1\nO 10.1.0.0/16 [110/3] via 192.168.2.1\nO 10.1.2.0/24 [110/2] via 192.168.3.1",
+   "subtopic": "ルーティングテーブルの解釈",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "OSPF の経路（メトリックが動的に最適化されるため）",
+    "静的ルート（AD が 1 で OSPF の 110 より小さいため）",
+    "両方が載り、負荷分散される",
+    "後に学習・設定された方"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "異なる経路情報源から同じプレフィックスが得られた場合、AD（信頼度）が最も小さいものが採用される。AD は直接接続 0、静的ルート 1、OSPF 110。よって静的ルートが載る。メトリックは同一の経路情報源内での比較に使う。",
+   "id": "q002",
+   "stem": "同じプレフィックス 172.16.0.0/16 について、OSPF で学習した経路と、静的ルートで設定した経路の両方が存在する。ルーティングテーブルに載るのはどちらか。",
+   "subtopic": "AD（アドミニストレーティブディスタンス）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "通常の静的ルートより大きな AD を設定し、主経路が落ちたときだけテーブルに現れる予備経路",
+    "複数のネクストホップへ同時に転送する負荷分散用の静的ルート",
+    "DHCP で配布される静的ルート",
+    "IPv6 でのみ使える静的ルート"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "フローティング静的ルートは、静的ルートにあえて大きな AD（例：200）を設定したもの。通常時は AD の小さい主経路（動的ルーティング等）が優先され、主経路が消えたときだけこの静的ルートがテーブルに現れてバックアップとして働く。",
+   "id": "q003",
+   "stem": "フローティング静的ルートの説明として正しいものはどれか。",
+   "subtopic": "フローティング静的ルート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "auto-cost reference-bandwidth の設定が2台で異なる",
+    "Hello／Dead インターバルが2台で一致していない",
+    "DR 選挙がまだ終わっていない",
+    "OSPF のプロセス ID が2台で異なる"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "OSPF の隣接形成には、エリア ID、Hello／Dead インターバル、サブネット（ネットワークタイプによる）、認証などの一致が必要。Hello が届いていてもパラメータが一致しなければ隣接は形成されない。プロセス ID はルータ内部でのみ意味を持つため、相手と異なっていても問題ない。参照帯域幅の不一致はメトリック計算に影響するだけで、隣接形成は妨げない。",
+   "id": "q004",
+   "stem": "2台のルータ間で OSPFv2 の隣接（adjacency）が FULL にならない。show ip ospf neighbor では相手が表示されず、Hello は届いている。原因として最も可能性が高いものはどれか。",
+   "subtopic": "OSPF 隣接のトラブルシュート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "ルータ ID が最も小さいルータが DR になる",
+    "OSPF プライオリティが最も高く、同点ならルータ ID が最も大きいルータが DR になる",
+    "最初に起動したルータが常時 DR であり続ける（プリエンプションがある）",
+    "DR はエリア内の全ルータの投票で毎回選び直される"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "DR 選挙はプライオリティ（既定値 1、0 は選挙対象外）が最も高いルータが当選し、同点の場合はルータ ID が最も大きい方。なお OSPF の DR 選挙にはプリエンプション（横取り）がないため、後から起動したプライオリティの高いルータが既存の DR を置き換えることはない。",
+   "id": "q005",
+   "stem": "ブロードキャスト型ネットワークでの OSPF DR（Designated Router）の選挙について、正しいものはどれか。",
+   "subtopic": "OSPF DR/BDR 選挙",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "最も小さい物理インターフェースの IP アドレス",
+    "稼働中ループバックインターフェースのうち最も大きい IP アドレス。なければ物理インターフェースのうち最も大きい IP アドレス",
+    "ホスト名から自動生成される",
+    "MAC アドレスの下位4オクテット"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "ルータ ID の決定順序は、(1) router-id での明示設定、(2) ループバックインターフェースの最大 IP アドレス、(3) 稼働中物理インターフェースの最大 IP アドレス。安定した ID が必要な場合は明示設定が推奨される。",
+   "id": "q006",
+   "stem": "router-id コマンドで明示設定されていない場合、OSPF のルータ ID はどのように決まるか。",
+   "subtopic": "OSPF ルータ ID",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "ネクストホップの MAC アドレスの指定",
+    "送出インターフェースの指定",
+    "AD を 1 以外に変更すること",
+    "IPv6 ユニキャストルーティングの無効化"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "リンクローカルアドレスはリンクごとに意味を持つため、どのインターフェースから出すかが分からなければ転送できない。よって ipv6 route コマンドでネクストホップにリンクローカルアドレスを使う場合は、送出インターフェースの指定が必須になる（完全指定型）。",
+   "id": "q007",
+   "stem": "IPv6 の静的ルートで、ネクストホップにリンクローカルアドレス（fe80::/10）を指定する場合に必須となるものはどれか。",
+   "subtopic": "IPv6 静的ルート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "仮想 IP 宛てのトラフィックを実際に転送しているのはルータ B",
+    "仮想 IP 宛てのトラフィックを実際に転送しているのはルータ A で、B は A の障害時に引き継ぐ",
+    "A と B が交互にパケットを転送して負荷分散している",
+    "Active は設定が有効という意味で、転送は常時 B が行う"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "HSRP では Active ルータが仮想 IP／仮想 MAC 宛てのトラフィックを転送し、Standby ルータは Active の障害を検知すると役割を引き継ぐ。負荷分散したい場合はグループを複数作り、グループごとに Active を分ける（HSRP 自体は1グループでは負荷分散しない）。",
+   "id": "q008",
+   "stem": "show standby brief の出力で、あるグループについてルータ A が Active、ルータ B が Standby と表示されている。この状態の説明として正しいものはどれか。",
+   "subtopic": "FHRP（HSRP）の状態解釈",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0,
+    1
+   ],
+   "choices": [
+    "2台のエリア ID が一致していない",
+    "一方のインターフェースが passive-interface に設定されている",
+    "2台の OSPF プロセス ID が異なっている",
+    "2台のホスト名が似ている"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "エリア ID の不一致は隣接形成を妨げる。また passive-interface のインターフェースでは Hello を送信しないため、そのリンクでは隣接が形成されない。プロセス ID はルータ内部の識別子なので相手と異なってよい。ホスト名は無関係。",
+   "id": "q009",
+   "stem": "OSPFv2 の隣接が形成されない原因として正しいものを2つ選べ。",
+   "subtopic": "OSPF 隣接のトラブルシュート",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "110 はメトリック、2 は AD を表す",
+    "110 は AD、2 はメトリックを表す",
+    "110 はホップ数、2 は帯域を表す",
+    "110 は OSPF のエリア番号、2 はプロセス ID を表す"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "[110/2] の形式は [AD／メトリック]。この経路は OSPF（コード O）で学習され、AD は OSPF の既定値 110、メトリック（コスト）は 2。via の後がネクストホップ、最後が送出インターフェース。",
+   "id": "q010",
+   "stem": "ルーティングテーブルの行「O 10.1.2.0/24 [110/2] via 192.168.3.1, 00:00:15, GigabitEthernet0/0」について、正しい説明はどれか。",
+   "subtopic": "ルーティングテーブルの解釈",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "コスト 5 の経路",
+    "コスト 20 の経路",
+    "先に学習した方",
+    "ランダムに選ばれる"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "同じプロトコル・同じ宛先なら、メトリック（OSPF ではコスト）が小さい経路が選ばれる。プレフィックス長（longest match）と AD の比較を通過したあとの、最後の判定要素がメトリック。",
+   "id": "q011",
+   "stem": "OSPF で同じ宛先ネットワークへの経路が2つあり、コストが 5 と 20 だった。ルーティングテーブルに載るのはどちらか。",
+   "subtopic": "3.1 メトリックによる経路選択",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "1",
+    "10",
+    "100",
+    "0"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "コスト = 参照帯域（10^8 bps）÷ リンク帯域。1Gbps では 10^8 ÷ 10^9 = 0.1 となり、最小値の 1 に切り上げられる。このためデフォルト設定では 100Mbps 以上のリンクはすべてコスト 1 になり区別できない。高速リンクを区別するには参照帯域を引き上げる。",
+   "id": "q012",
+   "stem": "OSPF のコスト計算で、参照帯域がデフォルト（10^8 bps）のとき、1Gbps リンクのコストはいくつか。",
+   "subtopic": "3.3 OSPF のコスト",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "IPv4 専用のプロトコルである",
+    "ネイバとの通信にリンクローカルアドレスを使う",
+    "DR／BDR の選出がない",
+    "エリアの概念がない"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "OSPFv3 は IPv6 用で、ネイバとのやり取りにはリンクローカルアドレスを使う。DR／BDR の選出やエリアの概念は OSPFv2 と同様に存在する。ルータ ID は引き続き 32 ビットの値を使う。",
+   "id": "q013",
+   "stem": "OSPFv3 の特徴として正しいものはどれか。",
+   "subtopic": "3.3 OSPFv3",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "VRRP は Cisco 独自のプロトコルである",
+    "VRRP は標準規格（RFC）で、異なるベンダの機器間でも構成できる",
+    "VRRP では仮想 IP アドレスを持てない",
+    "HSRP は標準規格である"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "HSRP は Cisco 独自、VRRP は RFC で標準化された FHRP。マルチベンダ環境でゲートウェイを冗長化するなら VRRP が候補になる。どちらも仮想 IP／仮想 MAC による冗長化の仕組みは共通。",
+   "id": "q014",
+   "stem": "VRRP と HSRP の違いとして正しいものはどれか。",
+   "subtopic": "3.4 VRRP と HSRP",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "/32",
+    "/24",
+    "/0",
+    "/128"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "IPv4 のホストルートは、特定の1台だけを指す /32。/0 はデフォルトルート、/128 は IPv6 でのホストルートにあたる。",
+   "id": "q015",
+   "stem": "IPv4 のホストルートを表すプレフィックス長はどれか。",
+   "subtopic": "3.2 ホストルート",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "DR の選出方法が同じ",
+    "broadcast では DR／BDR を選出するが、point-to-point では選出しない",
+    "point-to-point ではエリアを使わない",
+    "broadcast では hello を送らない"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "マルチアクセス（broadcast）では DR／BDR が隣接の中心になる。1対1の point-to-point では選出自体が不要で、その分ネイバ確立も速い。エリアの使い方や hello の送信はどちらのタイプでも共通。",
+   "id": "q016",
+   "stem": "OSPF のネットワークタイプ broadcast と point-to-point の違いとして正しいものはどれか。",
+   "subtopic": "3.3 OSPF のネットワークタイプ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "手動設定 → ループバックの最大アドレス → 物理インターフェースの最大アドレス",
+    "物理インターフェースの最大アドレス → 手動設定 → ループバック",
+    "起動した順に若いインターフェース",
+    "ランダムに決まる"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "ルータ ID は、手動設定（router-id コマンド）が最優先。なければループバックインターフェースの最大 IP、それもなければ物理インターフェースの最大 IP が選ばれる。再現性のため手動設定が推奨される。",
+   "id": "q017",
+   "stem": "OSPF のルータ ID の決定順序として正しいものはどれか。",
+   "subtopic": "3.3 ルータ ID の決定",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "静的ルートは常に動的ルートより優先される",
+    "ネクストホップへの経路が存在しないと、静的ルートはテーブルに載らない",
+    "静的ルートはメトリックを持たない",
+    "静的ルートは再帰参照ができない"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "静的ルートは、ネクストホップへの到達性がルーティングテーブルで解決できて初めて有効になる（再帰参照）。ネクストホップに届く経路が消えると、その静的ルートもテーブルから消える。",
+   "id": "q018",
+   "stem": "静的ルートの動作として正しいものはどれか。",
+   "subtopic": "3.2 静的ルートと再帰参照",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "0000.0c07.acXX の XX は IP アドレスの下位",
+    "0000.0c07.acXX の XX は VLAN 番号",
+    "0000.0c07.acXX の XX は HSRP グループ番号",
+    "仮想 MAC はルータの実 MAC と同じ"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "HSRP の仮想 MAC は 0000.0c07.ac の後にグループ番号（16進2桁）が続く形式。グループ番号が違うと仮想 MAC も別物になり、c07 のケースのように別グループとして動作してしまう。",
+   "id": "q019",
+   "stem": "HSRP の仮想 MAC アドレスについて正しいものはどれか。",
+   "subtopic": "3.4 HSRP の仮想 MAC",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "発信インターフェースの指定も必要になる",
+    "グローバルアドレスでは設定できない",
+    "AD を必ず 1 にする",
+    "ルータ ID が必要になる"
+   ],
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "リンクローカルアドレスはそのリンクでしか意味を持たないため、どのリンクのネクストホップなのかを発信インターフェースで特定する必要がある。IPv6 の静的ルートでよくある設定漏れ。",
+   "id": "q020",
+   "stem": "IPv6 の静的ルートで、ネクストホップにリンクローカルアドレスを指定する場合に必要なことはどれか。",
+   "subtopic": "3.2 IPv6 静的ルート",
+   "type": "single"
+  },
+  {
+   "domain": "routing",
+   "examVersion": "v2.0",
+   "explanation": "OSPF の隣接は、hello で互いを確認する 2-Way、マスタ／スレーブを決める ExStart、要約（DBD）を交換する Exchange、不足分を要求・受信する Loading を経て、データベースが同期した Full に至る。どの状態で止まるかで、MTU や認証などの切り分けポイントが変わる。",
+   "id": "q021",
+   "items": [
+    "2-Way（hello で相互確認）",
+    "ExStart（マスタ／スレーブ決定）",
+    "Exchange（DBD の交換）",
+    "Loading（不足分の要求と受信）",
+    "Full（データベース同期完了）"
+   ],
+   "stem": "OSPF の隣接が確立するまでの状態遷移を、正しい順に並べ替えよ。",
+   "subtopic": "3.3 OSPF の隣接状態",
+   "type": "order"
+  },
+  {
+   "answer": [
+    0,
+    1
+   ],
+   "choices": [
+    "ペイロード全体を暗号化する",
+    "認証・認可・アカウンティングを個別に扱える",
+    "UDP の 1812／1813 番ポートを使う",
+    "パスワードのみを暗号化する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "TACACS+ は TCP 49 を使い、パケット全体を暗号化し、認証・認可・アカウンティングを分離できるのが特徴。UDP を使いパスワードのみ暗号化するのは RADIUS。機器管理の AAA では、コマンド単位の認可ができる TACACS+ がよく選ばれる。",
+   "id": "q401",
+   "stem": "TACACS+ の特徴として正しいものを2つ選べ。",
+   "subtopic": "4.1 AAA（TACACS+ と RADIUS）",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "TFTP",
+    "SCP",
+    "FTP",
+    "Telnet"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "SCP（と SFTP）は SSH を土台にするため、転送内容が暗号化される。TFTP や FTP は平文で認証情報も流れるため、設定ファイルや IOS イメージの受け渡しには安全な転送手段を使う。",
+   "id": "q402",
+   "stem": "ルータの設定ファイルを管理サーバへコピーしたい。転送中の盗聴を防げる手段はどれか。",
+   "subtopic": "4.2 安全なファイル転送（SFTP／SCP）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "端末ごとにグローバル IP アドレスを1つずつ割り当てる",
+    "送信元ポート番号で変換を区別する",
+    "MAC アドレスでセッションを区別する",
+    "DNS のラウンドロビンで振り分ける"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "PAT（NAT オーバーロード）は、複数のプライベートアドレスを1つのグローバルアドレスに変換し、セッションの区別に送信元ポート番号を使う。戻りの通信は変換テーブルで対応付けられる。",
+   "id": "q403",
+   "stem": "PAT（NAT オーバーロード）で、社内の多数の端末が1つのグローバル IP アドレスを共有してインターネットに出られる理由はどれか。",
+   "subtopic": "4.3 NAT／PAT",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "静的 NAT",
+    "動的 NAT（プール）",
+    "PAT（オーバーロード）",
+    "NAT は使わずブリッジで接続する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "外部から常に同じアドレスで到達させるには、内部アドレスとグローバルアドレスを1対1で固定する静的 NAT が必要。動的 NAT や PAT は内部から外部への通信が主用途で、外部起点の到達性は保証しない。",
+   "id": "q404",
+   "stem": "社内の Web サーバを、固定のグローバル IP アドレスでインターネットに公開したい。適した NAT の方式はどれか。",
+   "subtopic": "4.3 静的 NAT",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "A レコード",
+    "AAAA レコード",
+    "MX レコード",
+    "PTR レコード"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "メールの配送先は MX レコードで示される。Web への名前解決（A／AAAA）が正常でも、MX が欠けていたり誤っていたりするとメールだけが届かない。名前解決の切り分けでは、用途ごとに見るレコードが違う。",
+   "id": "q405",
+   "stem": "Web サイトには名前でアクセスできるのに、そのドメイン宛のメールが届かない。メール配送に関わる DNS レコードとして確認すべきものはどれか。",
+   "subtopic": "4.4 DNS レコードの診断",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0,
+    1
+   ],
+   "choices": [
+    "AAAA レコードは名前と IPv6 アドレスを対応付ける",
+    "PTR レコードは IP アドレスから名前を引く逆引きに使う",
+    "CNAME レコードはメールサーバを指定する",
+    "NS レコードは別名（エイリアス）を指定する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "AAAA は IPv6 版のアドレスレコード、PTR は逆引き用。CNAME は別名の指定、NS は権威ネームサーバの指定で、C と D は説明が入れ替わっている。",
+   "id": "q406",
+   "stem": "DNS レコードの説明として正しいものを2つ選べ。",
+   "subtopic": "4.4 DNS レコードの種類",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "トランスポートモード",
+    "トンネルモード",
+    "ネイティブモード",
+    "ブリッジモード"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "トンネルモードは元の IP パケット全体を暗号化し、新しい IP ヘッダを付けて送るため、拠点間 VPN で内部のアドレス体系を隠せる。トランスポートモードはペイロードだけを暗号化し、元のヘッダを残す（主にホスト間通信で使用）。",
+   "id": "q407",
+   "stem": "サイト間 IPsec VPN で、元の IP パケット全体を暗号化し、新しい IP ヘッダを付けて送るモードはどれか。",
+   "subtopic": "4.5 IPsec VPN（トンネルモード）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "送信元 IP アドレスのみ",
+    "送信元・宛先 IP アドレス、プロトコル、ポート番号",
+    "送信元 MAC アドレスのみ",
+    "VLAN ID のみ"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "拡張 ACL は宛先やポート番号まで条件にできるため、「Web サーバへの 443 だけ許可」のような細かい制御ができる。標準 ACL は送信元 IP のみ。配置の目安は、拡張 ACL は送信元の近く、標準 ACL は宛先の近く。",
+   "id": "q408",
+   "stem": "拡張 ACL がフィルタ条件に使えるものはどれか。",
+   "subtopic": "4.6 ACL（標準と拡張）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "DHCP 通信を監視し、正規サーバ以外からの応答を遮断して、IP と MAC の対応表（バインディングテーブル）を作る",
+    "クライアントへ IP アドレスを自動で配布する",
+    "ARP パケットを暗号化して盗聴を防ぐ",
+    "ブロードキャストを全ポートへ転送して到達性を確保する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "DHCP スヌーピングは、信頼できないポートからの DHCP サーバ応答（不正サーバ）を遮断し、正規のやり取りからバインディングテーブルを構築する。このテーブルは DAI など他の L2 セキュリティ機能の土台にもなる。",
+   "id": "q409",
+   "stem": "DHCP スヌーピングの役割として正しいものはどれか。",
+   "subtopic": "4.7 DHCP スヌーピング",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "バインディングテーブルと ARP の内容を照合し、不正な ARP を破棄する",
+    "ARP の応答速度を高速化する",
+    "DHCP サーバを冗長化する",
+    "1ポートに接続できる MAC アドレス数を制限する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "DAI（Dynamic ARP Inspection）は、DHCP スヌーピングのバインディングテーブルと照合して、送信元 IP と MAC の組み合わせが正しくない ARP を破棄する。ARP スプーフィング（なりすまし）への対策。MAC 数を制限するのはポートセキュリティの役割。",
+   "id": "q410",
+   "stem": "DAI（Dynamic ARP Inspection）の動作として正しいものはどれか。",
+   "subtopic": "4.7 DAI（動的 ARP 検査）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "接続された端末の MAC アドレスを自動学習し、設定として取り込む機能",
+    "ポートの速度を自動で固定する機能",
+    "VLAN の割り当てを自動で固定する機能",
+    "認証サーバと連携して端末を認証する機能"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "ポートセキュリティのスティッキー学習は、最初に接続された端末の MAC を学習して running-config に取り込む。これにより、許可する端末を1台ずつ手入力しなくても、接続された機器だけを許可できる。端末認証は 802.1X の役割。",
+   "id": "q411",
+   "stem": "ポートセキュリティのスティッキー（sticky）学習とは何か。",
+   "subtopic": "4.7 ポートセキュリティ（スティッキー学習）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "ブロードキャストなどの流量がしきい値を超えると、そのポートの転送を制限する",
+    "雷雨の接近を検知して機器を停止する",
+    "ポートを常時遮断して安全を確保する",
+    "DHCP のブロードキャストを止める"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "ストームコントロールは、ブロードキャスト／マルチキャスト／ユニキャストの流量を監視し、しきい値を超えたら制限することで、ループ等によるブロードキャストストームの拡大を抑える L2 の保護機能。",
+   "id": "q412",
+   "stem": "ストームコントロールの役割として正しいものはどれか。",
+   "subtopic": "4.7 ストームコントロール",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "信頼できないポートからのルータ広告（RA）を破棄し、端末が偽のゲートウェイを掴むのを防ぐ",
+    "IPv6 の通信そのものを無効化する",
+    "DNS の応答を検証する",
+    "ARP パケットを検査する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "RA ガードは、端末側のポートでルータ広告（RA）を受け付けないようにし、不正な機器が「自分がルータだ」と名乗って通信を迂回させる攻撃を防ぐ。ARP の検査は DAI の役割。",
+   "id": "q413",
+   "stem": "RA ガード（IPv6 RA Guard）の役割として正しいものはどれか。",
+   "subtopic": "4.7 RA ガード",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "送信元の近く",
+    "宛先の近く",
+    "インターネット境界のみ",
+    "配置場所で効果は変わらない"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "標準 ACL は送信元アドレスしか見られないため、送信元の近くに置くと「その送信元から他の宛先への正規の通信」まで止めてしまう。宛先の近くに置くことで、影響をその宛先向けだけに絞れる。拡張 ACL は条件が細かいため送信元の近くが目安。",
+   "id": "q414",
+   "stem": "標準 ACL の配置場所の目安として正しいものはどれか。",
+   "subtopic": "4.6 標準 ACL の配置",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "inside local アドレス",
+    "inside global アドレス",
+    "outside local アドレス",
+    "outside global アドレス"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "inside local は、内部ネットワークで実際に使われているアドレス（この例では 192.168.1.10）。インターネット側に見える 203.0.113.10 が inside global。inside／outside は「自組織の内側か外側か」、local／global は「内部で見た姿か外部で見た姿か」の組み合わせ。",
+   "id": "q415",
+   "stem": "社内サーバ 192.168.1.10 を、静的 NAT で 203.0.113.10 として公開している。192.168.1.10 は NAT の用語で何と呼ばれるか。",
+   "subtopic": "4.3 NAT の用語（inside local）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "宛先アドレスを反転させたもの",
+    "「どこまで一致すれば許可か」を表す、通常のサブネットマスクとはビットの意味が逆の値",
+    "ポート番号の範囲指定",
+    "プロトコル番号の一覧"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "ワイルドカードマスクは、0 のビットが「一致必須」、1 のビットが「無視」を表し、サブネットマスクとは 0／1 の意味が逆。例：192.168.1.0/24 の範囲は 0.0.0.255 と書く。",
+   "id": "q416",
+   "stem": "ACL のワイルドカードマスクとは何か。",
+   "subtopic": "4.6 ワイルドカードマスク",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "1〜99",
+    "100〜199",
+    "200〜299",
+    "1000〜1099"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "番号付き標準 ACL は 1〜99（拡張範囲 1300〜1999）。拡張 ACL は 100〜199（拡張範囲 2000〜2699）。番号の範囲で ACL の種類が決まる。",
+   "id": "q417",
+   "stem": "番号付き標準 ACL に使える番号の範囲はどれか。",
+   "subtopic": "4.6 ACL の番号範囲",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "機器へのログイン試行の回数を制限する",
+    "誰が・いつ・何をしたかを記録し、後から追跡できるようにする",
+    "パスワードを暗号化して保存する",
+    "ログインできる時間帯を制限する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "AAA の3要素は、認証（Authentication：誰か）、認可（Authorization：何をしてよいか）、アカウンティング（Accounting：何をしたかの記録）。アカウンティングの記録は、障害調査や監査で操作の追跡に使われる。",
+   "id": "q418",
+   "stem": "AAA のアカウンティング（Accounting）の役割はどれか。",
+   "subtopic": "4.1 AAA のアカウンティング",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "TFTP より転送速度が速いため",
+    "設定ファイルを自動で世代管理できるため",
+    "SSH の暗号化通信の上で転送でき、平文で流れないため",
+    "追加のライセンスが不要なため"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "SFTP／SCP は SSH を土台にするため、認証情報もファイル内容も暗号化される。TFTP や FTP は平文で、盗聴や改ざんへの耐性がない。速度や世代管理はこの選択の理由ではない。",
+   "id": "q419",
+   "stem": "機器のファイル転送に SFTP／SCP を使う理由として正しいものはどれか。",
+   "subtopic": "4.2 安全なファイル転送の理由",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "VTY 回線に SSH のみを許可し、アクセス ACL を適用する",
+    "Telnet を許可し、パスワードを長くする",
+    "コンソールポートを常時開放する",
+    "enable パスワードを共有する"
+   ],
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "リモート管理は、平文の Telnet を止めて SSH のみにし、VTY に ACL をかけて接続元を絞るのが基本。パスワードの長さだけでは平文通信の盗聴は防げない。",
+   "id": "q420",
+   "stem": "機器へのリモート管理アクセスを安全にする設定として適切なものはどれか。",
+   "subtopic": "4.1 管理アクセスの保護",
+   "type": "single"
+  },
+  {
+   "domain": "services-security",
+   "examVersion": "v2.0",
+   "explanation": "AAA は、接続要求を受けて、認証で「誰か」を確認し、認可で「何をしてよいか」を判定し、実行した内容をアカウンティングで記録する流れ。認可は認証の結果を前提にするため、この順序は入れ替わらない。",
+   "id": "q421",
+   "items": [
+    "接続要求の受付",
+    "認証（本人確認）",
+    "認可（権限の判定）",
+    "アカウンティング（操作の記録）"
+   ],
+   "stem": "AAA によるアクセス制御の処理を、正しい順に並べ替えよ。",
+   "subtopic": "4.1 AAA の処理順序",
+   "type": "order"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "質問に文章で答えるだけの仕組み",
+    "目標を与えると、計画を立て、ツールを実行しながら複数ステップの作業を自律的に進める仕組み",
+    "ネットワーク機器のファームウェアの一種",
+    "ログを保管するためのファイル形式"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "エージェント型 AI は、単発の応答ではなく、目標に向けて計画→実行→結果の確認を繰り返し、ツールや API を使って作業を進める点が特徴。ネットワーク運用では、情報収集や切り分けの補助などへの活用が想定される。",
+   "id": "q501",
+   "stem": "エージェント型 AI（Agentic AI）の説明として正しいものはどれか。",
+   "subtopic": "5.1 エージェント型 AI の役割",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "出力してほしい文字数",
+    "その情報のデータ分類（外部の AI に送ってよい情報かどうか）",
+    "プロンプトの語尾の丁寧さ",
+    "回答をもらう言語"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "生成 AI へ送る前に、情報の機密区分を確認するのが先。構成情報や IP アドレス体系、顧客情報などは、組織のルール上送れない場合がある。プロンプトの工夫より先に「送ってよい情報か」を判断する。",
+   "id": "q502",
+   "stem": "社内ネットワークの構成情報を生成 AI に送って相談する前に、最初に確認すべきことはどれか。",
+   "subtopic": "5.2 プロンプトとデータ分類",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0,
+    1
+   ],
+   "choices": [
+    "目的と前提条件を明示する",
+    "出力形式（表・手順など）を指定する",
+    "社内の機密情報をそのまま全部貼り付ける",
+    "「なんとかして」とだけ書く"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "良いプロンプトは、目的・前提・出力形式・制約が明確。曖昧な依頼では期待した形の答えが返りにくい。機密情報をそのまま貼るのはデータ分類の観点から不適切。",
+   "id": "q503",
+   "stem": "ネットワーク運用の支援を生成 AI に依頼するプロンプトとして、適切な要素を2つ選べ。",
+   "subtopic": "5.2 プロンプトの構成要素",
+   "type": "multi"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "機器ごとに CLI で個別に設定する",
+    "中央のコントローラからポリシーを一括で配布・管理する",
+    "紙の台帳で設定変更を管理する",
+    "設定変更のたびに機器の再起動が必要になる"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "コントローラベースの管理では、ポリシーや設定をコントローラで集中管理し、配下の機器へ一括で反映する。機器ごとに CLI で入るのはデバイスベースの管理。",
+   "id": "q504",
+   "stem": "コントローラベースのネットワーク管理の特徴はどれか。",
+   "subtopic": "5.3 ネットワーク管理アプローチ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "構成をコード（宣言的な定義）で管理し、再現性のある自動構築を行う考え方",
+    "機器を手作業で設定するための手順書の書式",
+    "ケーブル配線の物理規格",
+    "障害発生時の電話連絡網"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "IaC（Infrastructure as Code）は、インフラの構成をコードで定義してバージョン管理し、同じ定義から同じ環境を何度でも再現できるようにする考え方。自動化ベースの管理の中核になる。",
+   "id": "q505",
+   "stem": "IaC（Infrastructure as Code）の説明として正しいものはどれか。",
+   "subtopic": "5.3 IaC（Infrastructure as Code）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "管理サーバが定期的に機器へ問い合わせる仕組み",
+    "機器がイベント発生時に管理サーバへ自発的に送る通知",
+    "構成ファイルを暗号化して運ぶトンネル",
+    "機器の構成を自動でバックアップする機能"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "トラップは、インターフェースのダウンなどのイベントが起きた瞬間に、機器側から管理サーバへ送られる通知。定期的な問い合わせはポーリング（get）と呼ばれ、両方を組み合わせて監視する。",
+   "id": "q506",
+   "stem": "SNMP のトラップとは何か。",
+   "subtopic": "5.4 SNMP（トラップ）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "通信の高速化",
+    "認証と暗号化によるセキュリティの強化",
+    "自動配線機能",
+    "IPv6 専用プロトコルへの移行"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "SNMPv1／v2c はコミュニティ名が平文で流れるなどセキュリティが弱かった。v3 ではユーザ認証と暗号化が導入され、安全に監視情報をやり取りできるようになった。",
+   "id": "q507",
+   "stem": "SNMPv3 で、以前のバージョンから強化された点はどれか。",
+   "subtopic": "5.4 SNMPv3",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "管理対象に専用エージェントを常駐させる必要がある",
+    "エージェントレスで、SSH 経由で対象機器にコマンドを実行する",
+    "Windows 専用のツールである",
+    "GUI でのみ操作できる"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "Ansible は管理対象にエージェントを入れず、SSH（Windows なら WinRM）経由で接続してコマンドや設定を実行する。手順はプレイブックとして YAML で記述する。",
+   "id": "q508",
+   "stem": "構成管理ツール Ansible の特徴として正しいものはどれか。",
+   "subtopic": "5.5 Ansible による構成管理",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "0〜7 の範囲で、数値が小さいほど重大",
+    "0〜7 の範囲で、数値が大きいほど重大",
+    "1〜10 の範囲で、数値が小さいほど重大",
+    "重大度は数値では表さない"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "syslog の重大度は 0（Emergency：最も重大）から 7（Debug：デバッグ情報）。「小さいほど重大」が読み取りの基本で、運用では一定以上の重大度だけを通知対象にすることが多い。",
+   "id": "q509",
+   "stem": "syslog の重大度（severity）レベルについて正しいものはどれか。",
+   "subtopic": "5.6 syslog の重大度",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "重大度3（エラー）のメッセージで、Gi0/1 がダウンしたことを示す",
+    "3回目の再起動が発生したことを示す",
+    "3分後に自動復旧する予告を示す",
+    "ポート番号3の異常を示す"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "syslog メッセージは「%ファシリティ-重大度-ニーモニック」の形式。LINK はリンク関係、3 は重大度（エラー）、UPDOWN は状態変化を表すニーモニック。本文と合わせて「Gi0/1 がダウンした」と読む。",
+   "id": "q510",
+   "stem": "syslog メッセージ「%LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down」の解釈として正しいものはどれか。",
+   "subtopic": "5.6 syslog メッセージの解釈",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "管理サーバが定期的に機器へ問い合わせて情報を取得する",
+    "機器がイベント時に自発的に通知する",
+    "管理サーバが設定ファイルを配布する",
+    "機器同士が経路情報を交換する"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "ポーリングは、管理サーバが一定間隔で get を送って機器の状態を取得する方式。イベント発生時に機器から送られる通知はトラップで、両者を組み合わせて監視するのが一般的。",
+   "id": "q511",
+   "stem": "SNMP のポーリングとは何か。",
+   "subtopic": "5.4 SNMP（ポーリング）",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "メッセージの発生源の種別（カーネル、認証、メールなど）",
+    "メッセージの重大度",
+    "メッセージの宛先サーバ",
+    "メッセージの時刻精度"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "ファシリティは「どの機能・発生源からのメッセージか」を表す分類で、重大度（severity）とは別の軸。両方を組み合わせて、たとえば「認証系の、重大度4以上だけを通知する」といった振り分けができる。",
+   "id": "q512",
+   "stem": "syslog のファシリティ（facility）が表すものはどれか。",
+   "subtopic": "5.6 syslog のファシリティ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "機器ごとに現地で作業して管理する",
+    "ベンダのクラウド上の管理基盤から、インターネット経由で多数の機器を一元管理する",
+    "オフライン環境でのみ使える",
+    "紙の台帳と組み合わせることが必須である"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "クラウドベースの管理は、管理基盤がベンダのクラウドにあり、拠点の機器をインターネット経由で一元管理する方式。新拠点の追加や可視化がしやすい反面、インターネット接続が前提になる。",
+   "id": "q513",
+   "stem": "クラウドベースのネットワーク管理の特徴はどれか。",
+   "subtopic": "5.3 クラウドベース管理",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "回答させる役割や立場を定め、回答の観点や深さを寄せる",
+    "送る情報の機密区分を表す",
+    "出力の文字数を固定する",
+    "通信を暗号化する"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "ペルソナは「ベテランのネットワークエンジニアとして答えて」のように役割を指定する要素。回答の専門性や観点がその役割に寄る。機密区分はデータ分類、出力の形は出力形式の指定が担う、別の要素。",
+   "id": "q514",
+   "stem": "生成 AI へのプロンプトで「ペルソナ（役割）」を指定する目的はどれか。",
+   "subtopic": "5.2 プロンプトのペルソナ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "YAML",
+    "バイナリ形式",
+    "ベンダ独自の暗号化形式",
+    "画像ファイル"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "Ansible のプレイブックは YAML で記述し、対象機器はインベントリで指定する。人間にも読みやすいテキスト形式のため、バージョン管理と組み合わせて構成変更の履歴を残せる。",
+   "id": "q515",
+   "stem": "Ansible のプレイブックが記述される形式はどれか。",
+   "subtopic": "5.5 Ansible のプレイブック",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "対象機器の IP アドレスの一覧",
+    "管理対象の機器やグループを定義したファイル",
+    "プレイブックの実行結果の要約",
+    "暗号鍵の保管場所"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "インベントリは、Ansible が操作する対象ホストやグループを定義したもの。プレイブック（手順）とインベントリ（対象）が分かれているため、同じ手順を別拠点の機器群にも使い回せる。",
+   "id": "q521",
+   "stem": "Ansible のインベントリとは何か。",
+   "subtopic": "5.5 Ansible のインベントリ",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "機器の台数を減らせる",
+    "設定ファイルを自動で圧縮できる",
+    "手順をコード化して繰り返し実行でき、人手作業のミスやばらつきを減らせる",
+    "ベンダのサポート契約が不要になる"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "自動化の価値は、同じ手順を何度でも同じ品質で実行できること。手作業の入力ミスや設定のばらつきが減り、変更履歴もコードとして残る。台数や契約の話ではない。",
+   "id": "q522",
+   "stem": "ネットワーク運用を自動化する利点として最も適切なものはどれか。",
+   "subtopic": "5.3 自動化ベースの管理",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "機器の状態を表す項目（OID で識別される管理情報）の集まり",
+    "ログファイルを圧縮した形式",
+    "ルーティングテーブルの別名",
+    "ファームウェアの版数表"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "MIB は、SNMP で監視できる項目（インターフェースの流量、カウンタ、状態など）を OID という識別子で体系化したもの。監視サーバは OID を指定して値を取得する。",
+   "id": "q523",
+   "stem": "SNMP の MIB とは何か。",
+   "subtopic": "5.4 SNMP の MIB",
+   "type": "single"
+  },
+  {
+   "answer": [
+    1
+   ],
+   "choices": [
+    "そのまま本番手順として即座に実行する",
+    "事実確認と検証を行い、根拠を確認してから使う",
+    "文字数が多いほど正しいと判断する",
+    "出典を尋ねても意味がないので聞かない"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "生成 AI は、もっともらしいが誤った内容（ハルシネーション）を返すことがある。運用の判断に使う前に、公式ドキュメントや実機の出力で裏付けるのが前提。効率化の道具であって、検証の省略にはならない。",
+   "id": "q524",
+   "stem": "生成 AI の回答をネットワーク運用の判断に使う際の注意点として正しいものはどれか。",
+   "subtopic": "5.1／5.2 AI 回答の検証",
+   "type": "single"
+  },
+  {
+   "answer": [
+    2
+   ],
+   "choices": [
+    "重大度 5 はデバッグ情報を表す",
+    "CONFIG_I はルーティングの収束を示す",
+    "重大度 5（通知）で、設定変更が行われたことを記録するメッセージ",
+    "重大度 5 は最も重大な障害を表す"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "%SYS-5-CONFIG_I は、SYS ファシリティ、重大度 5（notification：通常だが有意な状態）、ニーモニック CONFIG_I で、「設定が変更された」という記録。障害ではなく、変更履歴の追跡に使うメッセージ。",
+   "id": "q525",
+   "stem": "syslog メッセージ「%SYS-5-CONFIG_I: Configured from console by admin」の解釈として正しいものはどれか。",
+   "subtopic": "5.6 syslog メッセージの解釈",
+   "type": "single"
+  },
+  {
+   "answer": [
+    0
+   ],
+   "choices": [
+    "機器が NTP で時刻同期していること",
+    "機器のホスト名が一意であること",
+    "syslog の重大度を 0 に固定すること",
+    "ログをローカルに保存しないこと"
+   ],
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "複数機器のログを突き合わせて時系列を追うには、各機器の時刻がそろっていることが前提になる。時刻がずれると、障害の前後関係を誤読する。NTP による同期はログ運用の土台。",
+   "id": "q526",
+   "stem": "複数機器の syslog を突き合わせて障害調査をするために重要な前提はどれか。",
+   "subtopic": "5.6 ログの時刻同期",
+   "type": "single"
+  },
+  {
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "syslog の重大度は数値が小さいほど重大で、0 の Emergency（システム使用不可）から始まる。ログのフィルタリングでは「指定した数値以下の重大度」が対象になるため、この序列が前提になる。",
+   "id": "q527",
+   "items": [
+    "Emergency（0）",
+    "Alert（1）",
+    "Critical（2）",
+    "Error（3）",
+    "Warning（4）"
+   ],
+   "stem": "syslog の重大度を、重大なものから順に並べ替えよ。",
+   "subtopic": "5.6 syslog 重大度の序列",
+   "type": "order"
+  },
+  {
+   "domain": "ai-ops",
+   "examVersion": "v2.0",
+   "explanation": "障害対応は、まず検知して切り分け、原因が分からなくても暫定対処で止血（復旧）を優先し、その後に原因を特定して恒久対策を打ち、最後に記録して共有する流れ。恒久対策を急ぐあまり復旧が遅れるのは本末転倒になる。",
+   "id": "q528",
+   "items": [
+    "検知",
+    "切り分け",
+    "暫定対処（止血）",
+    "原因の特定と恒久対策",
+    "記録と共有"
+   ],
+   "stem": "障害対応の基本的な流れを、正しい順に並べ替えよ。",
+   "subtopic": "5.6 障害対応の流れ",
+   "type": "order"
+  },
+  {
+   "id": "q122",
+   "domain": "infra",
+   "subtopic": "1.1 ケーブル種別と距離",
+   "type": "single",
+   "stem": "10GBASE-T を 100m まで引けるツイストペアケーブルはどれか。",
+   "choices": [
+    "カテゴリ5e",
+    "カテゴリ6",
+    "カテゴリ6A",
+    "カテゴリ7のみ"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Cat6A は 10GBASE-T を 100m まで対応します。Cat6 は 10G では 55m まで、Cat5e は 1G までが目安です。"
+  },
+  {
+   "id": "q123",
+   "domain": "infra",
+   "subtopic": "1.1 インターフェース／ケーブル障害の診断",
+   "type": "single",
+   "stem": "スイッチポートで CRC エラーと入力エラーが増え続けている。最も疑うべき層と原因はどれか。",
+   "choices": [
+    "物理層：ケーブル不良やコネクタの接触不良",
+    "データリンク層：VLAN 設定の誤り",
+    "ネットワーク層：ルーティングの誤り",
+    "トランスポート層：ポート番号の競合"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "CRC（FCS）エラーの増加はフレームが物理的に壊れて届いているサインで、ケーブル・コネクタなど物理層の不良をまず疑います。"
+  },
+  {
+   "id": "q124",
+   "domain": "infra",
+   "subtopic": "1.1 光ファイバの信号とコネクタ",
+   "type": "single",
+   "stem": "シングルモードファイバの特徴として正しいものはどれか。",
+   "choices": [
+    "コア径が大きく、短距離向けである",
+    "コア径が小さく、レーザー光で長距離伝送に向く",
+    "マルチモードより安価な光源を使える",
+    "曲げに強く、建物内の配線専用である"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "シングルモードはコア径が約9µmと小さく、レーザー光源で長距離・高速伝送に向きます。マルチモードはコア径が大きく LED 等で短距離向けです。"
+  },
+  {
+   "id": "q125",
+   "domain": "infra",
+   "subtopic": "1.1 Auto-MDIX",
+   "type": "single",
+   "stem": "近年のスイッチ同士をストレートケーブルでつないでもリンクが上がる理由はどれか。",
+   "choices": [
+    "スイッチがケーブルの種類を学習して VLAN を変えるから",
+    "Auto-MDIX が送受信ペアを自動で判別・入れ替えるから",
+    "STP がケーブル種別を判別するから",
+    "CDP がピン配列を通知するから"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Auto-MDIX はポートが MDI／MDI-X を自動判別して入れ替える機能で、ストレート／クロスの使い分けが不要になります。"
+  },
+  {
+   "id": "q126",
+   "domain": "infra",
+   "subtopic": "1.2 ROMMON の役割",
+   "type": "single",
+   "stem": "ルータの ROMMON モードでできることはどれか。",
+   "choices": [
+    "通常のルーティング処理の高速化",
+    "パスワードリカバリや IOS イメージの復旧",
+    "OSPF の隣接確立",
+    "DHCP プールの管理"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ROMMON は最小限のブート環境で、パスワードリカバリ、イメージの復旧、コンフィグレーションレジスタの操作などに使います。"
+  },
+  {
+   "id": "q127",
+   "domain": "infra",
+   "subtopic": "1.2 コンテナと仮想マシン",
+   "type": "single",
+   "stem": "コンテナと仮想マシン（VM）の違いとして正しいものはどれか。",
+   "choices": [
+    "コンテナはホスト OS のカーネルを共有し、VM はゲスト OS を個別に持つ",
+    "VM はカーネルを共有し、コンテナは共有しない",
+    "コンテナは必ずハイパーバイザ上で動く",
+    "両者に違いはない"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "コンテナはホストのカーネルを共有するため軽量で起動が速く、VM はハイパーバイザ上でゲスト OS ごと分離します。"
+  },
+  {
+   "id": "q128",
+   "domain": "infra",
+   "subtopic": "1.3 サブネット計算",
+   "type": "single",
+   "stem": "192.168.10.64/26 のブロードキャストアドレスはどれか。",
+   "choices": [
+    "192.168.10.65",
+    "192.168.10.126",
+    "192.168.10.127",
+    "192.168.10.255"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "/26 のブロックサイズは64。ネットワークは .64、次のネットワークは .128 なので、ブロードキャストは .127 です。"
+  },
+  {
+   "id": "q129",
+   "domain": "infra",
+   "subtopic": "1.3 サブネット計算",
+   "type": "single",
+   "stem": "/27 のサブネットで使用できるホストアドレスの数はどれか。",
+   "choices": [
+    "30",
+    "32",
+    "62",
+    "14"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "/27 はホスト部5ビットで 32 アドレス。ネットワークとブロードキャストを除いて 30 台です。"
+  },
+  {
+   "id": "q130",
+   "domain": "infra",
+   "subtopic": "1.3 サブネット計算",
+   "type": "single",
+   "stem": "10.1.1.130/25 が属するネットワークアドレスはどれか。",
+   "choices": [
+    "10.1.1.0",
+    "10.1.1.64",
+    "10.1.1.128",
+    "10.1.1.130"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "/25 のブロックサイズは128。.130 は 128〜255 の範囲に入るので、ネットワークアドレスは 10.1.1.128 です。"
+  },
+  {
+   "id": "q131",
+   "domain": "infra",
+   "subtopic": "1.3 プライベートアドレス",
+   "type": "multi",
+   "stem": "プライベート IPv4 アドレスの範囲に含まれるものをすべて選べ。",
+   "choices": [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "172.32.0.0/12",
+    "192.168.0.0/16"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ],
+   "explanation": "プライベートアドレスは 10.0.0.0/8、172.16.0.0/12（172.16〜172.31）、192.168.0.0/16。172.32 はパブリック側です。"
+  },
+  {
+   "id": "q132",
+   "domain": "infra",
+   "subtopic": "1.3 VLSM",
+   "type": "single",
+   "stem": "VLSM（可変長サブネットマスク）の利点はどれか。",
+   "choices": [
+    "すべてのサブネットを同じ大きさにそろえられる",
+    "必要なホスト数に合わせてサブネットの大きさを変え、アドレスを節約できる",
+    "サブネット計算が不要になる",
+    "ブロードキャストをなくせる"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "VLSM は場所ごとに必要な大きさのサブネットを割り当てる考え方で、アドレス空間の無駄を減らせます。"
+  },
+  {
+   "id": "q133",
+   "domain": "infra",
+   "subtopic": "1.4 IPv6 アドレス表記",
+   "type": "single",
+   "stem": "IPv6 のリンクローカルアドレスの範囲はどれか。",
+   "choices": [
+    "FE80::/10",
+    "FF00::/8",
+    "2000::/3",
+    "::1/128"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "リンクローカルは FE80::/10（FE80〜FEBF）。FF00::/8 はマルチキャスト、2000::/3 はグローバルユニキャスト、::1 はループバックです。"
+  },
+  {
+   "id": "q134",
+   "domain": "infra",
+   "subtopic": "1.4 IPv6 アドレス表記",
+   "type": "single",
+   "stem": "IPv6 アドレスの省略表記について正しいものはどれか。",
+   "choices": [
+    "「::」はアドレスの中で何回でも使える",
+    "「::」は1つのアドレスの中で1回だけ使える",
+    "各フィールドの先行ゼロは省略できない",
+    "「::」は末尾にしか使えない"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ゼロの連続を置き換える「::」は、アドレスの長さが一意に定まるよう1回だけ使用できます。先行ゼロは省略可能です。"
+  },
+  {
+   "id": "q135",
+   "domain": "infra",
+   "subtopic": "1.4 IPv6 マルチキャスト",
+   "type": "single",
+   "stem": "FF02::1 が表す宛先はどれか。",
+   "choices": [
+    "リンク内の全ルータ",
+    "リンク内の全ノード",
+    "全世界の全ノード",
+    "DHCP サーバ全体"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "FF02::1 はリンクローカルスコープの全ノードマルチキャスト。なお FF02::2 が全ルータ向けです。"
+  },
+  {
+   "id": "q136",
+   "domain": "infra",
+   "subtopic": "1.5 無線の原理（チャネル選択）",
+   "type": "single",
+   "stem": "2.4GHz 帯で干渉しないチャネルの組み合わせはどれか。",
+   "choices": [
+    "1・2・3",
+    "1・6・11",
+    "2・7・12",
+    "1・5・9"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "2.4GHz 帯はチャネル同士が重なっており、互いに干渉しないのは 1・6・11 の組み合わせです。"
+  },
+  {
+   "id": "q137",
+   "domain": "infra",
+   "subtopic": "1.5 無線の帯域特性",
+   "type": "single",
+   "stem": "5GHz 帯の特徴として正しいものはどれか。",
+   "choices": [
+    "2.4GHz より障害物に強く遠くまで届く",
+    "使えるチャネルが多く干渉を受けにくいが、到達距離は短め",
+    "電子レンジの干渉を受けやすい",
+    "帯域幅は 2.4GHz より狭い"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "5GHz はチャネル数が多く干渉が少ない一方、直進性が強く障害物で減衰しやすいため到達距離は短めです。"
+  },
+  {
+   "id": "q138",
+   "domain": "infra",
+   "subtopic": "1.5 無線のセキュリティ",
+   "type": "single",
+   "stem": "WPA3 で採用された、パスワード認証を強化する仕組みはどれか。",
+   "choices": [
+    "WEP",
+    "TKIP",
+    "SAE",
+    "WPS"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "WPA3 は SAE（Simultaneous Authentication of Equals）で鍵交換を行い、辞書攻撃への耐性を高めています。"
+  },
+  {
+   "id": "q139",
+   "domain": "infra",
+   "subtopic": "1.5 無線コントローラ",
+   "type": "single",
+   "stem": "CAPWAP トンネルを使う無線 LAN 構成の説明として正しいものはどれか。",
+   "choices": [
+    "AP が単独で全設定を持ち、コントローラは不要",
+    "軽量 AP は WLC（無線 LAN コントローラ）に接続し、制御を集中管理する",
+    "WLC は有線スイッチの STP を制御する装置である",
+    "CAPWAP は暗号化専用の規格である"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "集中管理型では軽量 AP が CAPWAP で WLC とつながり、設定やチャネル制御を WLC が担います。"
+  },
+  {
+   "id": "q140",
+   "domain": "infra",
+   "subtopic": "1.6 クライアント接続の確認",
+   "type": "single",
+   "stem": "ping の応答が「Destination unreachable」と「Request timed out」で異なる点はどれか。",
+   "choices": [
+    "unreachable は経路や宛先の問題が通知された状態、timed out は応答自体が返らない状態",
+    "どちらも同じ意味で、OS による表示の違いだけ",
+    "unreachable は名前解決の失敗を意味する",
+    "timed out は必ず宛先の電源が切れている"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "unreachable はルータ等から到達不能が ICMP で通知されたケース、timed out は応答が一切返らないケースで、切り分けの方向が変わります。"
+  },
+  {
+   "id": "q141",
+   "domain": "infra",
+   "subtopic": "1.6 クライアント接続の確認",
+   "type": "single",
+   "stem": "traceroute が経路上のルータを順に表示できる仕組みはどれか。",
+   "choices": [
+    "TTL を 1 ずつ増やしながら送り、各ルータからの ICMP 時間超過応答を利用する",
+    "各ルータが経路表を ping に添付する",
+    "DNS が経路情報を返す",
+    "ARP で全ルータの MAC を集める"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "traceroute は TTL=1,2,3… と増やして送り、TTL 切れを起こしたルータからの ICMP Time Exceeded で経路をたどります。"
+  },
+  {
+   "id": "q142",
+   "domain": "infra",
+   "subtopic": "1.7 DHCP の動作（DORA）",
+   "type": "single",
+   "stem": "DHCP リースの更新について正しいものはどれか。",
+   "choices": [
+    "リース期間の 50%（T1）で、借りたサーバへユニキャストで更新を試みる",
+    "更新は常にブロードキャストで Discover からやり直す",
+    "更新はリース切れの直前にしか行われない",
+    "クライアントから更新することはない"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "T1（50%）で元のサーバへユニキャスト更新を試み、失敗すると T2（87.5%）でブロードキャストによる再バインドを行います。"
+  },
+  {
+   "id": "q143",
+   "domain": "infra",
+   "subtopic": "1.7 DHCPv4 リレーのトラブルシュート",
+   "type": "single",
+   "stem": "DHCP リレーエージェントがサーバへ中継するとき、giaddr フィールドに入るのはどれか。",
+   "choices": [
+    "クライアントの MAC アドレス",
+    "リレーを受けたインターフェースの IP アドレス",
+    "DHCP サーバの IP アドレス",
+    "クライアントのホスト名"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "giaddr にはリレーエージェントの受信側 IP が入り、サーバはこれを見て割り当てるサブネット（プール）を判断します。"
+  },
+  {
+   "id": "q144",
+   "domain": "infra",
+   "subtopic": "1.7 DHCP サーバのトラブルシュート",
+   "type": "single",
+   "stem": "一部の端末だけ IP アドレスが 169.254.x.x になっている。最も可能性が高い原因はどれか。",
+   "choices": [
+    "DNS サーバの障害",
+    "DHCP プールの枯渇やリレー障害でアドレスを取得できず APIPA になった",
+    "ゲートウェイの HSRP 障害",
+    "端末の時刻ずれ"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "169.254.0.0/16 は APIPA（リンクローカル）の自動割り当てで、DHCP でアドレスを取れなかったときのサインです。"
+  },
+  {
+   "id": "q145",
+   "domain": "infra",
+   "subtopic": "1.4 IPv6 アドレスの種類",
+   "type": "fill",
+   "stem": "穴埋め：IPv6 アドレスの種類と意味",
+   "segments": [
+    "FF02::1 は",
+    null,
+    "アドレスで、",
+    null,
+    "を表す。"
+   ],
+   "tiles": [
+    "ユニキャスト",
+    "マルチキャスト",
+    "リンク内の全ノード",
+    "ブロードキャスト"
+   ],
+   "answer": [
+    1,
+    2
+   ],
+   "explanation": "FF で始まるアドレスはマルチキャスト。FF02::1 はリンク内の全ノード宛です。IPv6 にブロードキャストはありません。"
+  },
+  {
+   "id": "q146",
+   "domain": "infra",
+   "subtopic": "1.3 サブネット計算",
+   "type": "fill",
+   "stem": "穴埋め：/26 のホスト数",
+   "segments": [
+    "サブネットマスク /26 のホスト部は",
+    null,
+    "ビットで、使用できるホストは",
+    null,
+    "台である。"
+   ],
+   "tiles": [
+    "6",
+    "62",
+    "64",
+    "8"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "/26 はホスト部 32-26=6 ビット、アドレス数は 64、そのうち使えるのは 62 台です。"
+  },
+  {
+   "id": "q147",
+   "domain": "infra",
+   "subtopic": "1.6 インターフェース設定（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：インターフェースに IPv4 アドレスを設定する",
+   "pre": "対象：GigabitEthernet0/0\n設定するアドレス：192.168.1.1 /24\n現在のモード：インターフェースコンフィギュレーション",
+   "prompt": "Router(config-if)#",
+   "tiles": [
+    "ip",
+    "address",
+    "192.168.1.1",
+    "255.255.255.0",
+    "no",
+    "shutdown"
+   ],
+   "answer": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "explanation": "書式は ip address ＜アドレス＞ ＜マスク＞ です。なお実務ではこの後に no shutdown で有効化します。"
+  },
+  {
+   "id": "q148",
+   "domain": "infra",
+   "subtopic": "1.1 ゲートウェイ設定の診断",
+   "type": "single",
+   "stem": "図の構成で、PC からインターネットへ通信できない。PC の設定は IP 192.168.1.10/24、デフォルトゲートウェイ 192.168.1.254 である。原因はどれか。",
+   "choices": [
+    "PC の IP アドレスが重複している",
+    "ゲートウェイのアドレスが図のルータ（192.168.1.1）と一致していない",
+    "スイッチが VLAN を分けている",
+    "DNS が設定されていない"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "PC のゲートウェイは 192.168.1.254 ですが、実際のルータは 192.168.1.1 です。同一サブネット外への通信はゲートウェイ宛に送られるため、この不一致で外部に出られません。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"45.0\" y=\"65.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC</text><text x=\"45.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">192.168.1.10/24</text><text x=\"45.0\" y=\"93.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">GW: .254</text><line x1=\"80\" y1=\"75\" x2=\"120\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"120\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"155.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW</text><line x1=\"190\" y1=\"75\" x2=\"230\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"230\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"270.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">ルータ</text><text x=\"270.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">192.168.1.1</text></svg>"
+  },
+  {
+   "id": "q149",
+   "domain": "infra",
+   "subtopic": "1.3 サブネットの判断（図）",
+   "type": "single",
+   "stem": "図の2台の PC は同じスイッチにつながっているが、ルータなしでは直接通信できない。その理由はどれか。",
+   "choices": [
+    "MAC アドレスが重複しているから",
+    "/25 では 10.0.0.5 と 10.0.0.200 が別ネットワークに属するから",
+    "スイッチがポートをブロックしているから",
+    "ケーブルの種別が違うから"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "/25 の境界は .128 です。.5 は 10.0.0.0/25、.200 は 10.0.0.128/25 で別ネットワークになるため、通信にはルータ（L3）が必要です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"20\" width=\"90\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"35.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC-A</text><text x=\"55.0\" y=\"49.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">10.0.0.5/25</text><rect x=\"10\" y=\"95\" width=\"90\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"110.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC-B</text><text x=\"55.0\" y=\"124.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">10.0.0.200/25</text><rect x=\"200\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"235.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW</text><line x1=\"100\" y1=\"38\" x2=\"235\" y2=\"60\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"100\" y1=\"113\" x2=\"235\" y2=\"90\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/></svg>"
+  },
+  {
+   "id": "q150",
+   "domain": "infra",
+   "subtopic": "1.5 無線の干渉（図）",
+   "type": "single",
+   "stem": "図のように近接した AP1 と AP2 が 2.4GHz のチャネル 6 と 7 を使っている。問題点はどれか。",
+   "choices": [
+    "チャネルが重なり合い、互いに干渉する",
+    "チャネル番号が小さいほど電波が弱い",
+    "AP は2台以上設置できない",
+    "7 は日本では使えないチャネルである"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "2.4GHz 帯のチャネルは帯域が重なっており、6 と 7 のような近接チャネルは干渉します。1・6・11 のように離して割り当てます。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"40\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"80.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">AP1</text><text x=\"80.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">ch 6</text><rect x=\"200\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"240.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">AP2</text><text x=\"240.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">ch 7</text><line x1=\"120\" y1=\"75\" x2=\"200\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"160\" y=\"68\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">近接</text></svg>"
+  },
+  {
+   "id": "q222",
+   "domain": "switching",
+   "subtopic": "2.1 VLAN の効果",
+   "type": "single",
+   "stem": "VLAN でネットワークを分割する主な効果はどれか。",
+   "choices": [
+    "ブロードキャストドメインを分け、不要なブロードキャストを抑える",
+    "ケーブルの伝送速度が上がる",
+    "IP アドレスの払い出しが自動になる",
+    "暗号化が自動で有効になる"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "VLAN は L2 のブロードキャストドメインを分割します。ドメイン内の端末数やブロードキャスト量を抑えられます。"
+  },
+  {
+   "id": "q223",
+   "domain": "switching",
+   "subtopic": "2.1 トランクと 802.1Q",
+   "type": "single",
+   "stem": "802.1Q トランクでタグが付かないフレームはどれか。",
+   "choices": [
+    "VLAN 1 のフレームすべて",
+    "ネイティブ VLAN のフレーム",
+    "音声 VLAN のフレーム",
+    "管理 VLAN のフレーム"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ネイティブ VLAN のフレームだけはタグなしで送られます。両端でネイティブ VLAN が食い違うと通信不通や警告の原因になります。"
+  },
+  {
+   "id": "q224",
+   "domain": "switching",
+   "subtopic": "2.1 DTP の注意点",
+   "type": "single",
+   "stem": "本番環境でトランク設定の方針として望ましいものはどれか。",
+   "choices": [
+    "DTP の動的ネゴシエーションに任せて自動で決める",
+    "トランク／アクセスを明示的に固定し、不要なネゴシエーションを止める",
+    "すべてのポートを dynamic desirable にする",
+    "ネイティブ VLAN をランダムに変える"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DTP 任せは意図しないトランク化や攻撃の余地を生みます。モードは明示設定し、switchport nonegotiate 等で固定するのが定石です。"
+  },
+  {
+   "id": "q225",
+   "domain": "switching",
+   "subtopic": "2.1 トランクの allowed VLAN",
+   "type": "single",
+   "stem": "既存のトランクに VLAN 30 だけを追加したい。正しいコマンドの考え方はどれか。",
+   "choices": [
+    "switchport trunk allowed vlan 30 とだけ書く（追加になる）",
+    "switchport trunk allowed vlan add 30 と add を付ける",
+    "allowed vlan を書き直す必要はなく自動で増える",
+    "VLAN 30 を作り直せば自動で通る"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "allowed vlan を普通に書くと一覧が置き換わってしまいます。追加は add、削除は remove を付けます。"
+  },
+  {
+   "id": "q226",
+   "domain": "switching",
+   "subtopic": "2.1 SVI と L3 スイッチ",
+   "type": "single",
+   "stem": "レイヤ3スイッチで VLAN 間ルーティングを行う仕組みはどれか。",
+   "choices": [
+    "各 VLAN に SVI（仮想インターフェース）を用意し、スイッチ内部でルーティングする",
+    "トランクを2本に増やす",
+    "STP のコストを下げる",
+    "PoE の給電量を上げる"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "L3 スイッチは VLAN ごとの SVI に IP を持たせ、内部で VLAN 間ルーティングします。ルータ・オン・ア・スティックより高速です。"
+  },
+  {
+   "id": "q227",
+   "domain": "switching",
+   "subtopic": "2.2 VLAN の範囲",
+   "type": "single",
+   "stem": "拡張 VLAN の範囲はどれか。",
+   "choices": [
+    "1〜1005",
+    "1006〜4094",
+    "4095〜8190",
+    "2〜64"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "標準範囲は 1〜1005、拡張範囲は 1006〜4094 です。拡張 VLAN は VTP トランスペアレントモード等での利用が前提になります。"
+  },
+  {
+   "id": "q228",
+   "domain": "switching",
+   "subtopic": "2.2 音声 VLAN",
+   "type": "single",
+   "stem": "1つのアクセスポートに IP 電話と、その先の PC をつなぐ構成で使う機能はどれか。",
+   "choices": [
+    "音声 VLAN（ボイス VLAN）",
+    "ネイティブ VLAN の変更",
+    "ポートミラーリング",
+    "ストームコントロール"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "音声 VLAN を使うと、電話の音声トラフィックと PC のデータトラフィックを同じ物理ポートで別 VLAN に分けられます。"
+  },
+  {
+   "id": "q229",
+   "domain": "switching",
+   "subtopic": "2.2 PoE のネゴシエーション",
+   "type": "single",
+   "stem": "PoE の給電量の細かい交渉に使われる仕組みはどれか。",
+   "choices": [
+    "CDP／LLDP による電力交渉",
+    "DHCP のオプション",
+    "ARP の応答",
+    "STP の BPDU"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "規格上のクラス分けに加え、CDP や LLDP を使って機器同士が細かい要求電力を交渉します。"
+  },
+  {
+   "id": "q230",
+   "domain": "switching",
+   "subtopic": "2.3 LLDP",
+   "type": "single",
+   "stem": "LLDP の特徴として正しいものはどれか。",
+   "choices": [
+    "シスコ独自プロトコルである",
+    "IEEE 802.1AB の標準で、ベンダを問わず使える",
+    "IP アドレスの払い出しを行う",
+    "暗号化された制御プロトコルである"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "LLDP は IEEE 標準の隣接探索プロトコルです。シスコ独自のものは CDP です。"
+  },
+  {
+   "id": "q231",
+   "domain": "switching",
+   "subtopic": "2.3 CDP で得られる情報",
+   "type": "single",
+   "stem": "show cdp neighbors detail で分かる情報はどれか。",
+   "choices": [
+    "隣接機器の IP アドレスや IOS バージョン",
+    "隣接機器のルーティングテーブル全文",
+    "全ポートのトラフィック量",
+    "VLAN データベースの内容"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "CDP の detail 表示では、隣接機器のホスト名、IP アドレス、機種、IOS バージョン、接続ポートなどが確認できます。"
+  },
+  {
+   "id": "q232",
+   "domain": "switching",
+   "subtopic": "2.4 SPAN",
+   "type": "single",
+   "stem": "SPAN（ポートミラーリング）の用途はどれか。",
+   "choices": [
+    "ポートのトラフィックを複製して、解析用ポートへ送る",
+    "2つのポートを束ねて帯域を増やす",
+    "ポートの給電量を測る",
+    "MAC アドレスを固定する"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "SPAN は対象ポートの送受信フレームをコピーし、Wireshark 等をつないだ監視ポートへ送って解析できるようにします。"
+  },
+  {
+   "id": "q233",
+   "domain": "switching",
+   "subtopic": "2.4 MAC アドレステーブル",
+   "type": "single",
+   "stem": "show mac address-table で確認できる対応関係はどれか。",
+   "choices": [
+    "IP アドレスとホスト名",
+    "MAC アドレスと、その機器がつながるポート／VLAN",
+    "ユーザー名とパスワード",
+    "チャネルと電波強度"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "MAC アドレステーブルは、学習した MAC アドレスと出力ポート・VLAN の対応を示します。機器の接続先ポートの特定に使います。"
+  },
+  {
+   "id": "q234",
+   "domain": "switching",
+   "subtopic": "2.5 STP のコスト",
+   "type": "single",
+   "stem": "802.1t（ショートパスコスト）で 1Gbps リンクのコストはどれか。",
+   "choices": [
+    "4",
+    "19",
+    "100",
+    "2"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "ショートパスコストでは 10G=2、1G=4、100M=19、10M=100 です。コストの合計が小さい経路がルートポート側に選ばれます。"
+  },
+  {
+   "id": "q235",
+   "domain": "switching",
+   "subtopic": "2.5 RSTP のポート役割",
+   "type": "single",
+   "stem": "Rapid PVST+ で、ルートポートの予備としてブロックされるポートの役割はどれか。",
+   "choices": [
+    "指定ポート",
+    "代替ポート（Alternate）",
+    "エッジポート",
+    "アップリンクポート"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Alternate ポートはルートブリッジへの代替経路を持ち、障害時に速やかに引き継げるようブロック状態で待機します。"
+  },
+  {
+   "id": "q236",
+   "domain": "switching",
+   "subtopic": "2.5 ループの症状",
+   "type": "multi",
+   "stem": "L2 ループ（ブロードキャストストーム）が起きたときの症状として典型的なものをすべて選べ。",
+   "choices": [
+    "スイッチの CPU 使用率が跳ね上がる",
+    "MAC アドレスが複数ポートで揺れる（フラッピング）",
+    "DHCP プールが静かに枯渇する",
+    "ブロードキャストが増幅して回線が埋まる"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ],
+   "explanation": "ループではフレームが回り続けて帯域と CPU を食い、同じ MAC が複数ポートで学習されるフラッピングが起きます。"
+  },
+  {
+   "id": "q237",
+   "domain": "switching",
+   "subtopic": "2.1 EtherChannel（LACP）",
+   "type": "single",
+   "stem": "LACP で、両端とも passive に設定した場合の結果はどれか。",
+   "choices": [
+    "チャネルは成立する",
+    "どちらも開始を待つためチャネルは成立しない",
+    "片方が自動で active になる",
+    "エラーでポートが落ちる"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "LACP は少なくとも一方が active でないと交渉が始まりません。両端 passive では EtherChannel は成立しません。"
+  },
+  {
+   "id": "q238",
+   "domain": "switching",
+   "subtopic": "2.1 EtherChannel のロードバランス",
+   "type": "single",
+   "stem": "EtherChannel の負荷分散について正しいものはどれか。",
+   "choices": [
+    "1つのフロー（会話）は1本の物理リンクだけを通る",
+    "フレームごとにラウンドロビンで全リンクへ流す",
+    "常に最も空いているリンクを動的に選ぶ",
+    "負荷分散は IP アドレスでは行えない"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "EtherChannel の分散はハッシュ方式で、同一フローのフレームは同じリンクを通ります。順序の入れ替わりを防ぐためです。"
+  },
+  {
+   "id": "q239",
+   "domain": "switching",
+   "subtopic": "2.5 PortFast の適用先",
+   "type": "single",
+   "stem": "PortFast を有効にしてよいポートはどれか。",
+   "choices": [
+    "スイッチ同士をつなぐポート",
+    "PC やサーバなどの末端機器をつなぐエッジポート",
+    "ルータ同士をつなぐポート",
+    "EtherChannel のメンバーすべて"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "PortFast は末端機器向けで、接続直後にフォワーディングへ移行させます。スイッチ間ポートに使うと一時ループの危険があります。"
+  },
+  {
+   "id": "q240",
+   "domain": "switching",
+   "subtopic": "2.4 MAC テーブルのエージング",
+   "type": "single",
+   "stem": "MAC アドレステーブルのエントリが消える主なきっかけはどれか。",
+   "choices": [
+    "エージングタイマ（既定300秒）の経過",
+    "DHCP のリース更新",
+    "STP の再計算のたびに全消去",
+    "電源を切るまで消えない"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "学習したエントリはエージングタイマで自動的に削除され、使われ続けるものは再学習で延命します。既定は300秒です。"
+  },
+  {
+   "id": "q241",
+   "domain": "switching",
+   "subtopic": "2.1 トランクとネイティブ VLAN",
+   "type": "fill",
+   "stem": "穴埋め：トランクのタグ付け",
+   "segments": [
+    "トランクポートでは、",
+    null,
+    " VLAN のフレームだけがタグを付けずに送られる。"
+   ],
+   "tiles": [
+    "ネイティブ",
+    "音声",
+    "管理",
+    "デフォルト"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "タグなしで送られるのはネイティブ VLAN のフレームだけです。両端のネイティブ VLAN は一致させるのが原則です。"
+  },
+  {
+   "id": "q242",
+   "domain": "switching",
+   "subtopic": "2.5 Rapid PVST+（ルートブリッジ選出）",
+   "type": "fill",
+   "stem": "穴埋め：ルートブリッジの選出",
+   "segments": [
+    "ルートブリッジには",
+    null,
+    "が最も小さいスイッチが選ばれ、同点の場合は",
+    null,
+    "が小さい方が優先される。"
+   ],
+   "tiles": [
+    "ブリッジ ID",
+    "MAC アドレス",
+    "ポート番号",
+    "IP アドレス"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "ブリッジ ID は「優先度＋MAC アドレス」。まず優先度（ブリッジ ID の上位）で比べ、同点なら MAC アドレスの小さい方です。"
+  },
+  {
+   "id": "q243",
+   "domain": "switching",
+   "subtopic": "2.1 アクセスポート設定（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：ポートをアクセスモードにする",
+   "pre": "対象：FastEthernet0/1\n目的：末端 PC 用のアクセスポートにする\n現在のモード：インターフェースコンフィギュレーション",
+   "prompt": "SW(config-if)#",
+   "tiles": [
+    "switchport",
+    "mode",
+    "access",
+    "trunk",
+    "host"
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ],
+   "explanation": "書式は switchport mode access です。あわせて switchport access vlan ＜番号＞ で所属 VLAN を指定します。"
+  },
+  {
+   "id": "q244",
+   "domain": "switching",
+   "subtopic": "2.5 Rapid PVST+（ルートブリッジ選出）",
+   "type": "single",
+   "stem": "図の3台のスイッチで、ルートブリッジに選ばれるのはどれか。（優先度はすべて既定 32768＋VLAN 分）",
+   "choices": [
+    "SW1（MAC 0001.aaaa.0001）",
+    "SW2（MAC 0002.bbbb.0002）",
+    "SW3（MAC 0003.cccc.0003）",
+    "リンク速度が速い SW2"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "優先度がすべて同点なら、MAC アドレスが最も小さいスイッチがルートブリッジになります。図では SW1 です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"50.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW1</text><text x=\"50.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">0001.aaaa.0001</text><rect x=\"130\" y=\"10\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"170.0\" y=\"27.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW2</text><text x=\"170.0\" y=\"41.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">0002.bbbb.0002</text><rect x=\"240\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"275.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW3</text><text x=\"275.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">0003.cccc...</text><line x1=\"90\" y1=\"65\" x2=\"130\" y2=\"35\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"210\" y1=\"35\" x2=\"245\" y2=\"60\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"90\" y1=\"85\" x2=\"240\" y2=\"85\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/></svg>"
+  },
+  {
+   "id": "q245",
+   "domain": "switching",
+   "subtopic": "2.1 VLAN 間通信（図）",
+   "type": "single",
+   "stem": "図のように、同じスイッチ上の VLAN 10 の PC-A と VLAN 20 の PC-B が通信するには何が必要か。",
+   "choices": [
+    "そのまま通信できる",
+    "ルータまたは L3 スイッチ（SVI）による VLAN 間ルーティング",
+    "トランクポートを1本追加する",
+    "STP を無効化する"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "異なる VLAN は異なるブロードキャストドメイン（別ネットワーク）です。通信には L3 の中継（ルータや SVI）が必要です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"20\" width=\"90\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"35.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC-A</text><text x=\"55.0\" y=\"49.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">VLAN 10</text><rect x=\"10\" y=\"95\" width=\"90\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"110.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC-B</text><text x=\"55.0\" y=\"124.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">VLAN 20</text><rect x=\"210\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"245.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW</text><line x1=\"100\" y1=\"38\" x2=\"240\" y2=\"62\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"100\" y1=\"113\" x2=\"240\" y2=\"88\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/></svg>"
+  },
+  {
+   "id": "q246",
+   "domain": "switching",
+   "subtopic": "2.1 EtherChannel の診断（図）",
+   "type": "single",
+   "stem": "図の2台のスイッチ間は2本のリンクがあるが、片方（下のリンク）だけポートチャネルに組み込まれていない。この状態の問題はどれか。",
+   "choices": [
+    "特に問題はない",
+    "STP が片方のリンクをブロックし、束ねた帯域が得られない／不整合の警告が出る",
+    "自動的に EtherChannel が4Gbps になる",
+    "PoE の給電が止まる"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "片側だけ束ねると構成不整合になり、STP が片方をブロックするなど、意図した帯域も冗長性も得られません。両端で同じ設定が必要です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"20\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW1</text><rect x=\"230\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"265.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW2</text><line x1=\"90\" y1=\"68\" x2=\"230\" y2=\"68\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"160\" y=\"60\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">Po1</text><line x1=\"90\" y1=\"85\" x2=\"230\" y2=\"85\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"160\" y=\"100\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">単独</text></svg>"
+  },
+  {
+   "id": "q022",
+   "domain": "routing",
+   "subtopic": "3.1 ルーティングテーブルの解釈",
+   "type": "single",
+   "stem": "宛先 10.1.2.3 に対して、10.0.0.0/8、10.1.0.0/16、10.1.2.0/24 の経路がある。使われるのはどれか。",
+   "choices": [
+    "10.0.0.0/8（AD が小さい想定）",
+    "10.1.0.0/16",
+    "10.1.2.0/24（最長一致）",
+    "3本すべてに分散される"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "経路選択の第一原則は最長一致（ロンゲストマッチ）で、最も具体的な /24 が選ばれます。AD やメトリックの比較は、その次の話です。"
+  },
+  {
+   "id": "q023",
+   "domain": "routing",
+   "subtopic": "3.1 AD（アドミニストレーティブディスタンス）",
+   "type": "single",
+   "stem": "AD（アドミニストレーティブディスタンス）が使われる場面はどれか。",
+   "choices": [
+    "同じ宛先への経路を、異なる経路情報源（静的／OSPF など）から得たときの優先付け",
+    "同じ OSPF 内でのコスト比較",
+    "パケットの TTL の決定",
+    "NAT の変換順序の決定"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "AD は経路情報源の信頼度です。同一プロトコル内の比較はメトリック、プロトコル間の比較は AD が先に行われます。"
+  },
+  {
+   "id": "q024",
+   "domain": "routing",
+   "subtopic": "3.2 デフォルトルート",
+   "type": "single",
+   "stem": "デフォルトルートの表記として正しいものはどれか。",
+   "choices": [
+    "0.0.0.0/0",
+    "255.255.255.255/32",
+    "127.0.0.0/8",
+    "0.0.0.0/32"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "デフォルトルートは 0.0.0.0/0 で、どの経路にも一致しない宛先の最終的な受け皿（ラストリゾート）になります。"
+  },
+  {
+   "id": "q025",
+   "domain": "routing",
+   "subtopic": "3.2 静的ルートの設定",
+   "type": "single",
+   "stem": "イーサネットのようなマルチアクセス区間への静的ルートでは、出口インターフェースだけの指定よりネクストホップ指定が推奨される理由はどれか。",
+   "choices": [
+    "出口だけだと宛先ごとに ARP が必要になり、プロキシ ARP 依存になるから",
+    "ネクストホップの方が AD が下がるから",
+    "出口指定ではルートが表示されないから",
+    "速度が上がるから"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "出口 IF だけの静的ルートは「直接接続」とみなされ、宛先の数だけ ARP が発生し、対向のプロキシ ARP に依存します。ネクストホップ指定が確実です。"
+  },
+  {
+   "id": "q026",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF 隣接のトラブルシュート",
+   "type": "single",
+   "stem": "OSPF で Hello／Dead タイマが両端で食い違うとどうなるか。",
+   "choices": [
+    "隣接（アジャセンシ）が確立しない",
+    "コストが自動で揃えられる",
+    "DR 選挙だけ失敗する",
+    "LSA の配布だけ止まる"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Hello／Dead 間隔は隣接の条件で、一致しないルータ同士は隣接を確立できません。エリア ID や認証、MTU なども同様の必須一致項目です。"
+  },
+  {
+   "id": "q027",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF エリア",
+   "type": "single",
+   "stem": "OSPF のエリア 0 の役割はどれか。",
+   "choices": [
+    "末端の小規模エリア",
+    "バックボーンエリアで、他のエリアはすべてここを経由してつながる",
+    "外部経路専用のエリア",
+    "エリア間通信を禁止するための領域"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "エリア 0 はバックボーンで、エリア間ルーティングはすべてエリア 0 を経由する設計です。他のエリアは ABR でエリア 0 に接続します。"
+  },
+  {
+   "id": "q028",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF のコスト",
+   "type": "single",
+   "stem": "参照帯域 100Mbps の既定計算では、1Gbps リンクと 10Gbps リンクのコストはどうなるか。",
+   "choices": [
+    "1G=1、10G=1 で区別できない",
+    "1G=10、10G=1",
+    "1G=1、10G=0.1",
+    "どちらも 100"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "既定の参照帯域（10^8）では 100Mbps 以上はすべてコスト1になり区別できません。高速回線では参照帯域の変更が必要です。"
+  },
+  {
+   "id": "q029",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF DR/BDR 選挙",
+   "type": "single",
+   "stem": "DR 選挙について正しいものはどれか。",
+   "choices": [
+    "後から優先度の高いルータが参加すると、直ちに DR が交代する（プリエンプトする）",
+    "DR はプリエンプトせず、既存の DR が落ちるまで交代しない",
+    "ルータ ID が最小のものが DR になる",
+    "DR はエリアごとに1台だけ選ばれる"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "OSPF の DR/BDR は非プリエンプトです。安定性のため、途中で優先度の高いルータが来ても交代しません。"
+  },
+  {
+   "id": "q030",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF パッシブインターフェース",
+   "type": "single",
+   "stem": "passive-interface を設定したインターフェースの挙動はどれか。",
+   "choices": [
+    "OSPF の Hello を送らなくなり隣接は作らないが、そのネットワークは広告される",
+    "そのネットワーク自体が広告されなくなる",
+    "インターフェースが shutdown される",
+    "コストが無限大になる"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "パッシブにすると Hello を送受信せず隣接は作りませんが、接続ネットワークは LSA に含まれて広告されます。末端 LAN 向けの定石です。"
+  },
+  {
+   "id": "q031",
+   "domain": "routing",
+   "subtopic": "3.4 HSRP の状態",
+   "type": "single",
+   "stem": "HSRP で、仮想 IP への ARP に実際に応答し転送を担う状態はどれか。",
+   "choices": [
+    "Standby",
+    "Listen",
+    "Active",
+    "Speak"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Active ルータが仮想 MAC を名乗り、ゲートウェイとしての転送を担います。Standby は障害時に引き継ぐ待機役です。"
+  },
+  {
+   "id": "q032",
+   "domain": "routing",
+   "subtopic": "3.4 HSRP プリエンプション",
+   "type": "single",
+   "stem": "HSRP で優先度を上げたルータにすぐ Active を引き継がせたいときに必要な設定はどれか。",
+   "choices": [
+    "preempt（プリエンプション）の有効化",
+    "track の削除",
+    "仮想 IP の変更",
+    "Hello タイマの短縮"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "HSRP は既定でプリエンプトしません。優先度の高いルータに戻ってきたときに Active を奪い返させるには preempt の設定が必要です。"
+  },
+  {
+   "id": "q033",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF の LSA",
+   "type": "single",
+   "stem": "タイプ1 LSA（ルータ LSA）の内容はどれか。",
+   "choices": [
+    "各ルータが自分のリンク状態をエリア内に広告するもの",
+    "エリア間の経路集約",
+    "外部 AS の経路",
+    "DR が作るネットワーク全体の地図"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "タイプ1は全ルータが生成し、自分のリンクと隣接をエリア内にフラッディングします。エリア間はタイプ3、外部はタイプ5です。"
+  },
+  {
+   "id": "q034",
+   "domain": "routing",
+   "subtopic": "3.1 経路選択の順序",
+   "type": "fill",
+   "stem": "穴埋め：経路選択の比較順序",
+   "segments": [
+    "ルータはまず宛先に最も長く一致する経路を選び、候補が複数あれば",
+    null,
+    "が小さい方を、さらに同点なら",
+    null,
+    "が小さい方を選ぶ。"
+   ],
+   "tiles": [
+    "AD（アドミニストレーティブディスタンス）",
+    "メトリック",
+    "ホップ数",
+    "帯域幅"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "順序は「最長一致 → AD → メトリック」です。AD は情報源同士の信頼度、メトリックは同一プロトコル内の優劣です。"
+  },
+  {
+   "id": "q035",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF のコスト",
+   "type": "fill",
+   "stem": "穴埋め：OSPF のコスト計算",
+   "segments": [
+    "OSPF のコストは",
+    null,
+    "÷ 帯域で計算され、合計コストが",
+    null,
+    "経路が優先される。"
+   ],
+   "tiles": [
+    "参照帯域",
+    "小さい",
+    "大きい",
+    "遅延"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "コスト = 参照帯域 ÷ 帯域。値が小さいほど優先されます（速い回線ほどコストが下がります）。"
+  },
+  {
+   "id": "q036",
+   "domain": "routing",
+   "subtopic": "3.2 静的ルート設定（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：静的ルートを追加する",
+   "pre": "目的：172.16.0.0/24 への経路を、ネクストホップ 10.0.0.2 で登録する\n現在のモード：グローバルコンフィギュレーション",
+   "prompt": "R1(config)#",
+   "tiles": [
+    "ip",
+    "route",
+    "172.16.0.0",
+    "255.255.255.0",
+    "10.0.0.2",
+    "0.0.0.0"
+   ],
+   "answer": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "explanation": "書式は ip route ＜宛先＞ ＜マスク＞ ＜ネクストホップ＞ です。"
+  },
+  {
+   "id": "q037",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF の有効化（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：ネットワークを OSPF エリア 0 で有効化する",
+   "pre": "対象ネットワーク：192.168.1.0/24\n現在のモード：ルータコンフィギュレーション（router ospf 1 設定済み）",
+   "prompt": "R1(config-router)#",
+   "tiles": [
+    "network",
+    "192.168.1.0",
+    "0.0.0.255",
+    "area",
+    "0",
+    "255.255.255.0"
+   ],
+   "answer": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "explanation": "書式は network ＜アドレス＞ ＜ワイルドカードマスク＞ area ＜番号＞。ワイルドカードはサブネットマスクの反転です（/24 → 0.0.0.255）。"
+  },
+  {
+   "id": "q038",
+   "domain": "routing",
+   "subtopic": "3.2 静的ルートの判断（図）",
+   "type": "single",
+   "stem": "図の構成で、R1 から支社の 172.16.0.0/24 へ届けるために R1 に必要な設定はどれか。",
+   "choices": [
+    "何も不要（直接届く）",
+    "172.16.0.0/24 宛の静的ルート（ネクストホップは R2 側 10.0.0.2）",
+    "デフォルトゲートウェイを PC に設定する",
+    "R3 のルートだけ入れればよい"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "R1 と 172.16.0.0/24 は直接つながっていません。隣の R2（10.0.0.2）をネクストホップとする静的ルート（またはルーティングプロトコル）が必要です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"2\" y=\"55\" width=\"74\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"39.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC</text><text x=\"39.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">192.168.1.0/24</text><line x1=\"76\" y1=\"75\" x2=\"95\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"95\" y=\"55\" width=\"55\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"122.5\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R1</text><line x1=\"150\" y1=\"75\" x2=\"185\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"167\" y=\"66\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">10.0.0.0/30</text><rect x=\"185\" y=\"55\" width=\"55\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"212.5\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R2</text><line x1=\"240\" y1=\"75\" x2=\"256\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"256\" y=\"55\" width=\"62\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"287.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">支社</text><text x=\"287.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">172.16.0.0/24</text></svg>"
+  },
+  {
+   "id": "q039",
+   "domain": "routing",
+   "subtopic": "3.3 OSPF DR/BDR 選挙",
+   "type": "single",
+   "stem": "図の同一セグメント上の3台で、OSPF の DR になるのはどれか。（優先度：R1=既定1、R2=10、R3=既定1）",
+   "choices": [
+    "R1（ルータ ID 最大）",
+    "R2（優先度が最も高い）",
+    "R3（最後に起動）",
+    "DR は選ばれない"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DR 選挙はまず OSPF 優先度で決まります。最高の R2 が DR、次点の優先度同点ではルータ ID の大きい方が BDR になります。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"50.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R1</text><text x=\"50.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">優先度 1</text><rect x=\"120\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"160.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R2</text><text x=\"160.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">優先度 10</text><rect x=\"230\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"270.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R3</text><text x=\"270.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">優先度 1</text><line x1=\"90\" y1=\"75\" x2=\"120\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"200\" y1=\"75\" x2=\"230\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/></svg>"
+  },
+  {
+   "id": "q040",
+   "domain": "routing",
+   "subtopic": "3.4 HSRP の動作（図）",
+   "type": "single",
+   "stem": "図の構成で R1 が故障したとき、PC の通信はどうなるか。（PC のゲートウェイは仮想 IP 192.168.1.254）",
+   "choices": [
+    "ゲートウェイを直すまで全断する",
+    "Standby の R2 が Active になり、PC の設定変更なしで通信が復旧する",
+    "PC が自動で R2 の実 IP を学習し直す",
+    "スイッチの再起動が必要"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "HSRP では仮想 IP／仮想 MAC を Standby が引き継ぐため、PC 側はゲートウェイ設定そのままで通信が戻ります。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"45.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC</text><text x=\"45.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">GW: .254</text><line x1=\"80\" y1=\"75\" x2=\"120\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"120\" y=\"55\" width=\"60\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"150.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">SW</text><line x1=\"180\" y1=\"68\" x2=\"225\" y2=\"45\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><line x1=\"180\" y1=\"85\" x2=\"225\" y2=\"105\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"225\" y=\"20\" width=\"85\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"267.5\" y=\"35.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R1 Active</text><text x=\"267.5\" y=\"49.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">.1 ✕故障</text><rect x=\"225\" y=\"95\" width=\"85\" height=\"36\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"267.5\" y=\"110.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R2 Standby</text><text x=\"267.5\" y=\"124.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">.2</text></svg>"
+  },
+  {
+   "id": "q422",
+   "domain": "services-security",
+   "subtopic": "4.1 AAA（TACACS+ と RADIUS）",
+   "type": "single",
+   "stem": "TACACS+ と RADIUS の違いとして正しいものはどれか。",
+   "choices": [
+    "TACACS+ は TCP 49 を使い、通信全体を暗号化する",
+    "RADIUS は TCP を使う",
+    "TACACS+ は認証と認可を分離できない",
+    "両者は同じポートを使う"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "TACACS+ は TCP 49 で全体を暗号化し、認証・認可・アカウンティングを分離できます。RADIUS は UDP で、パスワード部分のみ暗号化します。"
+  },
+  {
+   "id": "q423",
+   "domain": "services-security",
+   "subtopic": "4.1 AAA の構成要素",
+   "type": "single",
+   "stem": "AAA の「認可（Authorization）」の説明はどれか。",
+   "choices": [
+    "利用者が誰かを確認すること",
+    "認証された利用者に、許可する操作や範囲を決めること",
+    "操作の記録を残すこと",
+    "パスワードを暗号化すること"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "認証（誰か）→ 認可（何をしてよいか）→ アカウンティング（何をしたかの記録）の順です。"
+  },
+  {
+   "id": "q424",
+   "domain": "services-security",
+   "subtopic": "4.2 管理アクセスの保護",
+   "type": "single",
+   "stem": "機器へのリモート管理で Telnet を避ける理由はどれか。",
+   "choices": [
+    "Telnet は速度が遅いから",
+    "通信が平文で、認証情報や操作内容が盗聴されるから",
+    "Telnet は IPv6 で使えないから",
+    "Telnet はポートが固定できないから"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Telnet は平文通信です。管理アクセスは SSH（暗号化）に置き換えるのが原則です。"
+  },
+  {
+   "id": "q425",
+   "domain": "services-security",
+   "subtopic": "4.2 安全なファイル転送（SFTP／SCP）",
+   "type": "single",
+   "stem": "SCP が安全な転送を実現できる土台はどれか。",
+   "choices": [
+    "FTP の暗号化拡張",
+    "SSH の仕組み（暗号化と認証）の上でファイル転送を行う",
+    "TFTP にパスワードを付けたもの",
+    "IPsec のみを使う"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "SCP と SFTP はどちらも SSH 上で動く転送方式で、SSH の暗号化と認証の恩恵を受けます。"
+  },
+  {
+   "id": "q426",
+   "domain": "services-security",
+   "subtopic": "4.3 NAT／PAT",
+   "type": "single",
+   "stem": "PAT（ポートアドレス変換）の動作はどれか。",
+   "choices": [
+    "1つのグローバルアドレスを、ポート番号で区別して複数の内部ホストで共有する",
+    "内部アドレスをそのまま外部へ出す",
+    "DNS 名を IP に変換する",
+    "MAC アドレスを変換する"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "PAT は inside global のアドレス＋ポート番号の組み合わせで各通信を区別し、1つのアドレスで多数の内部ホストをまかないます。"
+  },
+  {
+   "id": "q427",
+   "domain": "services-security",
+   "subtopic": "4.3 NAT のトラブルシュート",
+   "type": "single",
+   "stem": "NAT プール枯渇時に起きる症状はどれか。",
+   "choices": [
+    "全端末が同時に切断される",
+    "変換枠が空くまで、新規の内部ホストが外部へ出られない",
+    "DNS の応答が止まる",
+    "内部同士の通信も止まる"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "プール枯渇では既存の変換は続きますが、新規分のアドレス（またはポート）が用意できず、そのホストは外部へ出られません。PAT 化が緩和策です。"
+  },
+  {
+   "id": "q428",
+   "domain": "services-security",
+   "subtopic": "4.4 DNS レコードの種類",
+   "type": "multi",
+   "stem": "DNS レコードの対応として正しいものをすべて選べ。",
+   "choices": [
+    "AAAA：IPv6 アドレス",
+    "CNAME：別名への転送",
+    "PTR：メールサーバの指定",
+    "MX：名前からアドレスを引く正引き"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "AAAA は IPv6、A は IPv4、CNAME は別名、MX はメール配送先、PTR は逆引きです。"
+  },
+  {
+   "id": "q429",
+   "domain": "services-security",
+   "subtopic": "4.4 DNS の動作",
+   "type": "single",
+   "stem": "再帰問い合わせを受けた DNS サーバの動作はどれか。",
+   "choices": [
+    "知らなければ即座にエラーを返す",
+    "ルートから順に反復問い合わせを行い、最終回答をクライアントへ返す",
+    "クライアントに問い合わせ先の一覧だけを返す",
+    "キャッシュしか見ない"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "再帰問い合わせではサーバが代理でたどって最終結果を返します。サーバ同士のやり取りは反復問い合わせです。"
+  },
+  {
+   "id": "q430",
+   "domain": "services-security",
+   "subtopic": "4.5 IPsec VPN",
+   "type": "single",
+   "stem": "IPsec で、暗号化を担うプロトコルはどれか。",
+   "choices": [
+    "AH",
+    "ESP",
+    "IKE",
+    "GRE"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ESP が暗号化と完全性を提供します。AH は完全性のみで暗号化はしません。IKE は鍵交換と SA の確立を担います。"
+  },
+  {
+   "id": "q431",
+   "domain": "services-security",
+   "subtopic": "4.5 VPN の種類",
+   "type": "single",
+   "stem": "本社と支社の LAN 同士を常時つなぐ VPN はどれか。",
+   "choices": [
+    "リモートアクセス VPN",
+    "サイト間（site-to-site）VPN",
+    "SSL のクライアントレス接続",
+    "ダイヤルアップ VPN"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "拠点同士の LAN をつなぐのがサイト間 VPN で、両端の VPN 装置がトンネルを張り、利用者は VPN を意識しません。"
+  },
+  {
+   "id": "q432",
+   "domain": "services-security",
+   "subtopic": "4.6 ACL（標準と拡張）",
+   "type": "single",
+   "stem": "拡張 ACL の配置の原則はどれか。",
+   "choices": [
+    "宛先の近くに置く",
+    "送信元の近くに置く",
+    "必ずインターネット境界に置く",
+    "すべてのルータに同じものを置く"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "拡張 ACL は細かく絞れるため、不要なトラフィックを早めに落とせる「送信元の近く」が原則。標準 ACL は宛先近くです。"
+  },
+  {
+   "id": "q433",
+   "domain": "services-security",
+   "subtopic": "4.6 ACL の動作",
+   "type": "single",
+   "stem": "ACL の末尾にある暗黙のルールはどれか。",
+   "choices": [
+    "暗黙の permit any",
+    "暗黙の deny any（すべて拒否）",
+    "暗黙のログ出力",
+    "ルールは存在しない"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ACL は先頭から評価され、どれにも一致しなければ暗黙の deny any で破棄されます。許可したい通信は明示的に書く必要があります。"
+  },
+  {
+   "id": "q434",
+   "domain": "services-security",
+   "subtopic": "4.7 DAI（動的 ARP 検査）",
+   "type": "single",
+   "stem": "DAI（動的 ARP 検査）が ARP の正しさを照合する元データはどれか。",
+   "choices": [
+    "ルーティングテーブル",
+    "DHCP スヌーピングのバインディングテーブル",
+    "MAC アドレステーブル",
+    "syslog の履歴"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DAI はバインディングテーブル（IP／MAC／ポートの対応）と ARP の内容を照合し、ARP スプーフィングを防ぎます。"
+  },
+  {
+   "id": "q435",
+   "domain": "services-security",
+   "subtopic": "4.6 ACL の配置",
+   "type": "fill",
+   "stem": "穴埋め：ACL の配置原則",
+   "segments": [
+    "拡張 ACL は",
+    null,
+    "の近くに、標準 ACL は",
+    null,
+    "の近くに置くのが原則である。"
+   ],
+   "tiles": [
+    "送信元",
+    "宛先",
+    "インターネット境界",
+    "管理サーバ"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "拡張は細かく判定できるので早めに（送信元近くで）落とし、標準は誤って広く止めないよう宛先近くに置きます。"
+  },
+  {
+   "id": "q436",
+   "domain": "services-security",
+   "subtopic": "4.3 NAT／PAT",
+   "type": "fill",
+   "stem": "穴埋め：PAT の変換",
+   "segments": [
+    "PAT では、inside local アドレスが",
+    null,
+    "アドレスと",
+    null,
+    "番号の組み合わせに変換されて外部と通信する。"
+   ],
+   "tiles": [
+    "inside global",
+    "ポート",
+    "MAC",
+    "セッション ID"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "PAT はグローバルアドレスをポート番号で分け合います。戻りの通信は変換表のポート対応で振り分けられます。"
+  },
+  {
+   "id": "q437",
+   "domain": "services-security",
+   "subtopic": "4.6 拡張 ACL（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：拡張 ACL で HTTPS を許可する",
+   "pre": "要件：192.168.1.0/24 から、Web サーバ 10.0.0.5 の TCP 443 を許可する\nACL 番号：100",
+   "prompt": "R1(config)#",
+   "tiles": [
+    "access-list",
+    "100",
+    "permit",
+    "tcp",
+    "192.168.1.0 0.0.0.255",
+    "host 10.0.0.5",
+    "eq 443"
+   ],
+   "answer": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "explanation": "拡張 ACL の書式は access-list ＜番号＞ permit tcp ＜送信元＞ ＜宛先＞ eq ＜ポート＞ です。"
+  },
+  {
+   "id": "q438",
+   "domain": "services-security",
+   "subtopic": "4.2 管理アクセスの保護（ラボ）",
+   "type": "lab",
+   "stem": "コマンドを組み立てよ：VTY 回線を SSH のみに制限する",
+   "pre": "対象：line vty 0 4（回線コンフィギュレーションに入っている）\n目的：接続手段を SSH のみにする",
+   "prompt": "R1(config-line)#",
+   "tiles": [
+    "transport",
+    "input",
+    "ssh",
+    "telnet"
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ],
+   "explanation": "書式は transport input ssh です。Telnet を併記しないことで、平文の管理アクセスを閉じられます。"
+  },
+  {
+   "id": "q439",
+   "domain": "services-security",
+   "subtopic": "4.3 NAT の用語（図）",
+   "type": "single",
+   "stem": "図の NAT 変換で、10.0.0.5 が変換後のアドレス 203.0.113.1 で外部と通信している。この 203.0.113.1 の呼び方はどれか。",
+   "choices": [
+    "inside local",
+    "inside global",
+    "outside local",
+    "outside global"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "変換後の、自社側を表すグローバルアドレスが inside global。変換前のプライベートアドレスが inside local です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"80\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"50.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">内部 PC</text><text x=\"50.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">10.0.0.5</text><line x1=\"90\" y1=\"75\" x2=\"140\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"140\" y=\"55\" width=\"70\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"175.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">NAT</text><text x=\"175.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">ルータ</text><line x1=\"210\" y1=\"75\" x2=\"250\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"230\" y=\"66\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">203.0.113.1</text><rect x=\"250\" y=\"55\" width=\"60\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"280.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">外部</text><text x=\"280.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">サーバ</text></svg>"
+  },
+  {
+   "id": "q440",
+   "domain": "services-security",
+   "subtopic": "4.6 ACL の適用方向（図）",
+   "type": "single",
+   "stem": "社内 LAN（192.168.1.0/24）から外部サーバへの通信を入り口で検査したい。拡張 ACL を R1 の LAN 側インターフェースに適用する方向はどれか。",
+   "choices": [
+    "in（入ってくる方向）",
+    "out（出ていく方向）",
+    "どちらでも同じ",
+    "インターフェースには適用できない"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "LAN からルータへ入ってくるトラフィックを検査するので in 方向です。方向の取り違えは「書いたのに効かない」典型原因です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"55\" width=\"90\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"55.0\" y=\"72.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">社内 LAN</text><text x=\"55.0\" y=\"86.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">192.168.1.0/24</text><line x1=\"100\" y1=\"75\" x2=\"160\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"130\" y=\"66\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">→ in</text><rect x=\"160\" y=\"55\" width=\"60\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"190.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">R1</text><line x1=\"220\" y1=\"75\" x2=\"260\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"260\" y=\"55\" width=\"55\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"287.5\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">外部</text></svg>"
+  },
+  {
+   "id": "q441",
+   "domain": "services-security",
+   "subtopic": "4.5 IPsec VPN（図）",
+   "type": "single",
+   "stem": "図のサイト間 VPN で、IPsec によって暗号化される区間はどれか。",
+   "choices": [
+    "PC から本社ルータまで",
+    "本社ルータから支社ルータまでのインターネット区間",
+    "支社ルータから PC まで",
+    "全区間が暗号化される"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "サイト間 VPN のトンネルは両拠点の VPN 装置（ルータ）の間で張られます。暗号化されるのはその区間で、拠点内の LAN は平文です。",
+   "figure": "<svg viewBox=\"0 0 320 150\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"5\" y=\"55\" width=\"55\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"32.5\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">本社 PC</text><line x1=\"60\" y1=\"75\" x2=\"95\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"95\" y=\"55\" width=\"60\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"125.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">本社 R</text><line x1=\"155\" y1=\"75\" x2=\"215\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><text x=\"185\" y=\"66\" fill=\"#93a5c4\" font-size=\"9\" text-anchor=\"middle\">IPsec</text><rect x=\"215\" y=\"55\" width=\"60\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"245.0\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">支社 R</text><line x1=\"275\" y1=\"75\" x2=\"300\" y2=\"75\" stroke=\"#93a5c4\" stroke-width=\"1.5\"/><rect x=\"295\" y=\"55\" width=\"25\" height=\"40\" rx=\"6\" fill=\"#101a30\" stroke=\"#35c4e8\"/><text x=\"307.5\" y=\"79.0\" fill=\"#e8eef7\" font-size=\"10\" text-anchor=\"middle\">PC</text></svg>"
+  }
+ ]
 }
